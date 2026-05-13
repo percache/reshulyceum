@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block content %}
+<div id="task-view"></div>
+<script>
+const taskId = {{ task_id }};
+
+async function load() {
+  const r = await fetch('/api/tasks/' + taskId);
+  if (!r.ok) { document.getElementById('task-view').innerHTML = 'Задача не найдена'; return; }
+  const t = await r.json();
+  document.getElementById('task-view').innerHTML = `
+    <div class="task-view">
+      <div class="task-topic"><i class="fa-solid fa-folder-open"></i> ${t.topic} · <span class="difficulty-badge difficulty-${t.difficulty_level}"><i class="fa-solid fa-signal"></i> ${t.difficulty_label}</span> ${t.difficulty} · <i class="fa-solid fa-star"></i> +${t.xp_reward} XP</div>
+      <h2>${t.title}</h2>
+      <div class="desc">${t.description.replace(/\n/g, '<br>')}</div>
+      <form id="submit-form" class="answer-form">
+        <input id="answer" placeholder="Твой ответ" required autocomplete="off">
+        <button class="btn primary" type="submit"><i class="fa-solid fa-paper-plane"></i> Отправить</button>
+      </form>
+      <div id="result"></div>
+    </div>`;
+  document.getElementById('submit-form').addEventListener('submit', submitAnswer);
+}
+
+async function submitAnswer(e) {
+  e.preventDefault();
+  const token = localStorage.getItem('token');
+  if (!token) { alert('Сначала войди'); location.href='/login'; return; }
+  const ans = document.getElementById('answer').value;
+  const r = await fetch('/api/attempts', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: 'Bearer ' + token,
+    },
+    body: JSON.stringify({ task_id: taskId, answer: ans }),
+  });
+  if (!r.ok) { document.getElementById('result').innerHTML = '<div class="bad">Ошибка</div>'; return; }
+  const res = await r.json();
+  let html = res.is_correct
+    ? `<div class="good"><i class="fa-solid fa-circle-check"></i> Верно. +${res.xp_gained} XP · рейтинг ${res.rating_delta >= 0 ? '+' : ''}${res.rating_delta}</div>`
+    : `<div class="bad"><i class="fa-solid fa-circle-xmark"></i> Неверно. Попробуй ещё раз. Рейтинг ${res.rating_delta}</div>`;
+  if (res.explanation) html += `<div class="explanation">${res.explanation}</div>`;
+  if (res.unlocked_achievements && res.unlocked_achievements.length) {
+    html += `<div class="ach"><i class="fa-solid fa-award"></i> Получено: ${res.unlocked_achievements.join(', ')}</div>`;
+  }
+  document.getElementById('result').innerHTML = html;
+}
+
+load();
+</script>
+{% endblock %}

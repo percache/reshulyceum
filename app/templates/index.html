@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="hero">
+  <h1>ReshuLyceum</h1>
+  <p class="subtitle">Тренажёр для подготовки к ЕГЭ по информатике. Решай задачи, повышай рейтинг, отслеживай прогресс.</p>
+  <div class="cta">
+    <a class="btn primary" id="home-start" href="/tasks"><i class="fa-solid fa-play"></i> Начать решать</a>
+    <a class="btn ghost" id="home-register" href="/register"><i class="fa-solid fa-user-plus"></i> Регистрация</a>
+    <a class="btn ghost" id="home-profile" href="/profile" style="display:none"><i class="fa-solid fa-user"></i> В профиль</a>
+  </div>
+</section>
+
+<section class="features">
+  <div class="card">
+    <div class="feature-icon"><i class="fa-solid fa-sliders"></i></div>
+    <h3>Адаптивная сложность</h3>
+    <p>Алгоритм ELO подбирает задачи под твой уровень.</p>
+  </div>
+  <div class="card">
+    <div class="feature-icon"><i class="fa-solid fa-chart-line"></i></div>
+    <h3>Прогресс</h3>
+    <p>Опыт, уровни, серии дней подряд, достижения.</p>
+  </div>
+  <div class="card">
+    <div class="feature-icon"><i class="fa-solid fa-chart-pie"></i></div>
+    <h3>Аналитика</h3>
+    <p>Статистика по темам: где силён, а где надо подтянуть.</p>
+  </div>
+  <div class="card">
+    <div class="feature-icon"><i class="fa-solid fa-trophy"></i></div>
+    <h3>Рейтинг</h3>
+    <p>Сравнивай результаты с другими учениками.</p>
+  </div>
+</section>
+
+<section class="stats-bar">
+  <div><i class="fa-solid fa-book-open"></i> <b>{{ total_tasks }}</b> задач</div>
+  <div><i class="fa-solid fa-users"></i> <b>{{ total_users }}</b> учеников</div>
+</section>
+{% endblock %}

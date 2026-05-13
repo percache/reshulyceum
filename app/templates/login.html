@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="form-card">
+  <h2><i class="fa-solid fa-right-to-bracket"></i> Вход</h2>
+  <form id="login-form">
+    <label>Логин<input name="username" required></label>
+    <label>Пароль<input name="password" type="password" required></label>
+    <button class="btn primary" type="submit"><i class="fa-solid fa-right-to-bracket"></i> Войти</button>
+    <p class="error" id="login-error"></p>
+  </form>
+  <p>Нет аккаунта? <a href="/register">Зарегистрироваться</a></p>
+</div>
+<script>
+document.getElementById('login-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const form = new FormData(e.target);
+  const body = new URLSearchParams();
+  body.append('username', form.get('username'));
+  body.append('password', form.get('password'));
+  const r = await fetch('/api/auth/login', { method: 'POST', body });
+  if (!r.ok) { document.getElementById('login-error').textContent = 'Неверные данные'; return; }
+  const data = await r.json();
+  localStorage.setItem('token', data.access_token);
+  location.href = '/profile';
+});
+</script>
+{% endblock %}

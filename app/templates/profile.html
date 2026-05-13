@@ -1,0 +1,183 @@
+{% extends "base.html" %}
+{% block content %}
+<div id="profile"></div>
+
+<div class="charts-grid">
+  <div class="card">
+    <h3><i class="fa-solid fa-wave-square"></i> Активность за 14 дней</h3>
+    <canvas id="chart-timeline" height="120"></canvas>
+  </div>
+  <div class="card">
+    <h3><i class="fa-solid fa-chart-pie"></i> Решено по темам</h3>
+    <canvas id="chart-topics" height="120"></canvas>
+  </div>
+</div>
+
+<h3><i class="fa-solid fa-award"></i> Достижения</h3>
+<div id="achievements" class="ach-grid"></div>
+<h3><i class="fa-solid fa-clock-rotate-left"></i> Последние попытки</h3>
+<div id="history"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+<script>
+async function load() {
+  const token = localStorage.getItem('token');
+  if (!token) { location.href = '/login'; return; }
+  const h = { Authorization: 'Bearer ' + token };
+
+  const [me, stats, ach, hist, timeline] = await Promise.all([
+    fetch('/api/auth/me', { headers: h }).then(r => r.json()),
+    fetch('/api/stats/me', { headers: h }).then(r => r.json()),
+    fetch('/api/me/achievements', { headers: h }).then(r => r.json()),
+    fetch('/api/attempts/me?limit=20', { headers: h }).then(r => r.json()),
+    fetch('/api/stats/me/timeline?days=14', { headers: h }).then(r => r.json()),
+  ]);
+
+  const nextXp = Math.floor(100 * Math.pow(me.level, 1.5));
+  const prevXp = Math.floor(100 * Math.pow(me.level - 1, 1.5));
+  const pct = Math.min(100, Math.round((me.xp - prevXp) / (nextXp - prevXp) * 100));
+
+  document.getElementById('profile').innerHTML = `
+    <div class="profile-card">
+      <div class="profile-head">
+        <img class="avatar" src="${me.avatar_path || '/static/uploads/avatars/.gitkeep'}" alt="Аватар" onerror="this.style.display='none'; this.nextElementSibling.style.display='grid';">
+        <div class="avatar-placeholder" style="display:${me.avatar_path ? 'none' : 'grid'}"><i class="fa-solid fa-user"></i></div>
+        <div>
+          <h2><i class="fa-solid fa-user"></i> ${me.username}</h2>
+          <form id="avatar-form" class="avatar-form">
+            <input class="form-control form-control-sm" id="avatar-input" type="file" accept="image/png,image/jpeg,image/webp" required>
+            <button class="btn" type="submit"><i class="fa-solid fa-upload"></i> Загрузить аватар</button>
+          </form>
+          <div id="avatar-msg" class="muted"></div>
+        </div>
+      </div>
+      <div class="stat-row">
+        <div><i class="fa-solid fa-layer-group stat-icon"></i><b>${me.level}</b><span>Уровень</span></div>
+        <div><i class="fa-solid fa-star stat-icon"></i><b>${me.xp}</b><span>XP</span></div>
+        <div><i class="fa-solid fa-ranking-star stat-icon"></i><b>${me.rating}</b><span>Рейтинг</span></div>
+        <div><i class="fa-solid fa-fire-flame-curved stat-icon"></i><b>${me.current_streak}</b><span>Серия дней</span></div>
+        <div><i class="fa-solid fa-circle-check stat-icon"></i><b>${stats.solved_count}</b><span>Решено</span></div>
+        <div><i class="fa-solid fa-bullseye stat-icon"></i><b>${stats.accuracy}%</b><span>Точность</span></div>
+      </div>
+      <div class="level-progress">
+        <div class="lp-bar"><div class="lp-fill" style="width:${pct}%"></div></div>
+        <div class="lp-text">До уровня ${me.level + 1}: ${me.xp - prevXp} / ${nextXp - prevXp} XP</div>
+      </div>
+    </div>`;
+
+  document.getElementById('avatar-form').addEventListener('submit', uploadAvatar);
+
+  drawTimeline(timeline);
+  drawTopics(stats.by_topic);
+
+  document.getElementById('achievements').innerHTML = ach.length
+    ? ach.map(a => `<div class="ach-card"><i class="${a.icon || 'fa-solid fa-award'} ach-ico"></i><b>${a.title}</b><span>${a.description}</span></div>`).join('')
+    : '<p class="muted">Пока нет. Реши задачу, чтобы получить первое.</p>';
+
+  document.getElementById('history').innerHTML = hist.length
+    ? '<table class="history"><tr><th>Задача</th><th>Результат</th><th>XP</th></tr>' +
+      hist.map(a => `<tr><td><a href="/tasks/${a.task_id}"><i class="fa-solid fa-file-lines"></i> #${a.task_id}</a></td><td>${a.is_correct ? '<i class="fa-solid fa-circle-check good-icon"></i> верно' : '<i class="fa-solid fa-circle-xmark bad-icon"></i> неверно'}</td><td>+${a.xp_gained}</td></tr>`).join('') +
+      '</table>'
+    : '<p class="muted">Попыток пока нет</p>';
+}
+
+function chartColors() {
+  const isLight = document.documentElement.dataset.theme === 'light';
+  return {
+    text: isLight ? '#1a1d28' : '#e8eaf0',
+    grid: isLight ? 'rgba(0,0,0,0.08)' : 'rgba(255,255,255,0.08)',
+    accent: '#ffcc00',
+    accent2: '#ff5e57',
+  };
+}
+
+function drawTimeline(data) {
+  const c = chartColors();
+  const labels = data.map(d => d.date.slice(5));
+  new Chart(document.getElementById('chart-timeline'), {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [
+        {
+          label: 'XP за день',
+          data: data.map(d => d.xp),
+          borderColor: c.accent,
+          backgroundColor: 'rgba(255,204,0,0.15)',
+          tension: 0.3,
+          fill: true,
+        },
+        {
+          label: 'Решено',
+          data: data.map(d => d.solved),
+          borderColor: c.accent2,
+          backgroundColor: 'rgba(255,94,87,0.1)',
+          tension: 0.3,
+          yAxisID: 'y2',
+        },
+      ],
+    },
+    options: {
+      responsive: true,
+      plugins: { legend: { labels: { color: c.text } } },
+      scales: {
+        x: { ticks: { color: c.text }, grid: { color: c.grid } },
+        y: { ticks: { color: c.text }, grid: { color: c.grid }, beginAtZero: true },
+        y2: { position: 'right', ticks: { color: c.text }, grid: { display: false }, beginAtZero: true },
+      },
+    },
+  });
+}
+
+function drawTopics(byTopic) {
+  const c = chartColors();
+  const labels = Object.keys(byTopic);
+  const values = Object.values(byTopic);
+  if (!labels.length) {
+    document.getElementById('chart-topics').replaceWith(Object.assign(document.createElement('p'), { className: 'muted', textContent: 'Решите задачу, чтобы увидеть диаграмму' }));
+    return;
+  }
+  new Chart(document.getElementById('chart-topics'), {
+    type: 'doughnut',
+    data: {
+      labels,
+      datasets: [{
+        data: values,
+        backgroundColor: ['#ffcc00', '#ff5e57', '#4ade80', '#60a5fa', '#a78bfa', '#f472b6', '#34d399', '#fbbf24', '#fb923c'],
+      }],
+    },
+    options: {
+      responsive: true,
+      plugins: { legend: { position: 'right', labels: { color: c.text } } },
+    },
+  });
+}
+
+load();
+
+async function uploadAvatar(e) {
+  e.preventDefault();
+  const token = localStorage.getItem('token');
+  const file = document.getElementById('avatar-input').files[0];
+  if (!file) return;
+
+  const body = new FormData();
+  body.append('avatar', file);
+  const msg = document.getElementById('avatar-msg');
+  const r = await fetch('/api/auth/me/avatar', {
+    method: 'POST',
+    headers: { Authorization: 'Bearer ' + token },
+    body,
+  });
+  if (!r.ok) {
+    const err = await r.json().catch(() => ({}));
+    msg.textContent = err.detail || 'Не удалось загрузить аватар';
+    msg.style.color = 'var(--bad)';
+    return;
+  }
+  msg.textContent = 'Аватар обновлён';
+  msg.style.color = 'var(--good)';
+  setTimeout(() => location.reload(), 500);
+}
+</script>
+{% endblock %}

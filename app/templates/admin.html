@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+{% block content %}
+<h2><i class="fa-solid fa-shield-halved"></i> Админ-панель</h2>
+<div id="admin-gate" class="muted">Проверка прав…</div>
+
+<div id="admin-content" style="display:none">
+  <section class="admin-section">
+    <h3><i class="fa-solid fa-plus"></i> Создать задачу</h3>
+    <form id="create-form" class="admin-form">
+      <input name="title" placeholder="Название" required>
+      <input name="topic" placeholder="Тема" required>
+      <textarea name="description" placeholder="Условие" required rows="4"></textarea>
+      <div class="row">
+        <select id="difficulty-preset" onchange="applyDifficultyPreset()">
+          <option value="1000">Средне</option>
+          <option value="250">Очень легко</option>
+          <option value="700">Легко</option>
+          <option value="1450">Сложно</option>
+          <option value="2100">Очень сложно</option>
+        </select>
+        <input name="difficulty" type="number" placeholder="Сложность (100-3000)" value="1000" min="100" max="3000">
+        <input name="xp_reward" type="number" placeholder="XP" value="10" min="1" max="1000">
+      </div>
+      <input name="answer" placeholder="Эталонный ответ" required>
+      <textarea name="explanation" placeholder="Объяснение (необязательно)" rows="2"></textarea>
+      <button class="btn primary" type="submit"><i class="fa-solid fa-plus"></i> Создать</button>
+      <span id="create-msg"></span>
+    </form>
+  </section>
+
+  <section class="admin-section">
+    <h3><i class="fa-solid fa-table-list"></i> Все задачи</h3>
+    <div id="admin-tasks"></div>
+  </section>
+</div>
+
+<script>
+const token = localStorage.getItem('token');
+const h = { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' };
+
+async function init() {
+  if (!token) { location.href = '/login'; return; }
+  const me = await fetch('/api/auth/me', { headers: h }).then(r => r.json()).catch(() => null);
+  if (!me || !me.is_admin) {
+    document.getElementById('admin-gate').textContent = 'Доступ только для администраторов';
+    return;
+  }
+  document.getElementById('admin-gate').style.display = 'none';
+  document.getElementById('admin-content').style.display = 'block';
+  loadTasks();
+}
+
+async function loadTasks() {
+  const tasks = await fetch('/api/tasks?limit=200', { headers: h }).then(r => r.json());
+  document.getElementById('admin-tasks').innerHTML =
+    '<table class="lb"><tr><th>ID</th><th>Тема</th><th>Название</th><th>Сложн.</th><th>XP</th><th></th></tr>' +
+    tasks.map(t => `<tr>
+      <td>${t.id}</td><td>${t.topic}</td><td>${t.title}</td>
+      <td><span class="difficulty-badge difficulty-${t.difficulty_level}">${t.difficulty_label}</span> ${t.difficulty}</td><td>${t.xp_reward}</td>
+      <td><button class="btn" onclick="delTask(${t.id})"><i class="fa-solid fa-trash"></i> удалить</button></td>
+    </tr>`).join('') + '</table>';
+}
+
+function applyDifficultyPreset() {
+  document.querySelector('input[name="difficulty"]').value = document.getElementById('difficulty-preset').value;
+}
+
+async function delTask(id) {
+  if (!confirm('Удалить задачу #' + id + '?')) return;
+  const r = await fetch('/api/tasks/' + id, { method: 'DELETE', headers: h });
+  if (r.ok) loadTasks(); else alert('Ошибка удаления');
+}
+
+document.getElementById('create-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const fd = new FormData(e.target);
+  const payload = {
+    title: fd.get('title'),
+    topic: fd.get('topic'),
+    description: fd.get('description'),
+    difficulty: parseInt(fd.get('difficulty')),
+    xp_reward: parseInt(fd.get('xp_reward')),
+    answer: fd.get('answer'),
+    explanation: fd.get('explanation') || null,
+  };
+  const r = await fetch('/api/tasks', { method: 'POST', headers: h, body: JSON.stringify(payload) });
+  const msg = document.getElementById('create-msg');
+  if (r.ok) {
+    msg.textContent = 'Создано';
+    msg.style.color = 'var(--good)';
+    e.target.reset();
+    loadTasks();
+  } else {
+    const err = await r.json().catch(() => ({}));
+    msg.textContent = 'Ошибка: ' + (err.detail || '');
+    msg.style.color = 'var(--bad)';
+  }
+});
+
+init();
+</script>
+{% endblock %}

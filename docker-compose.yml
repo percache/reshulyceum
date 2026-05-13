@@ -1,0 +1,15 @@
+services:
+  app:
+    build: .
+    container_name: reshulyceum
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=sqlite:////data/reshulyceum.db
+      - SECRET_KEY=change-me-in-production-please
+    volumes:
+      - reshulyceum-data:/data
+    restart: unless-stopped
+
+volumes:
+  reshulyceum-data:

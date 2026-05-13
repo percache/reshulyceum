@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block content %}
+<h2><i class="fa-solid fa-list-check"></i> Каталог задач</h2>
+<div class="filter-bar">
+  <select id="filter-topic">
+    <option value="">Все темы</option>
+    {% for t in topics %}<option value="{{ t }}">{{ t }}</option>{% endfor %}
+  </select>
+  <select id="filter-level">
+    <option value="">Любая сложность</option>
+    <option value="very_easy">Очень легко</option>
+    <option value="easy">Легко</option>
+    <option value="medium">Средне</option>
+    <option value="hard">Сложно</option>
+    <option value="expert">Очень сложно</option>
+  </select>
+  <input id="filter-min" type="number" placeholder="Сложность от" min="100">
+  <input id="filter-max" type="number" placeholder="до" max="3000">
+  <button class="btn" onclick="loadTasks()"><i class="fa-solid fa-filter"></i> Применить</button>
+  <button class="btn primary" onclick="recommend()"><i class="fa-solid fa-wand-magic-sparkles"></i> Рекомендовать мне</button>
+</div>
+<div id="tasks-list" class="task-grid"></div>
+
+<script>
+async function loadTasks() {
+  const params = new URLSearchParams();
+  const topic = document.getElementById('filter-topic').value;
+  const level = document.getElementById('filter-level').value;
+  const min = document.getElementById('filter-min').value;
+  const max = document.getElementById('filter-max').value;
+  if (topic) params.append('topic', topic);
+  if (level) params.append('difficulty_level', level);
+  if (min) params.append('min_difficulty', min);
+  if (max) params.append('max_difficulty', max);
+  const r = await fetch('/api/tasks?' + params.toString());
+  render(await r.json());
+}
+async function recommend() {
+  const token = localStorage.getItem('token');
+  if (!token) { alert('Сначала войди в аккаунт'); location.href='/login'; return; }
+  const r = await fetch('/api/recommend', { headers: { Authorization: 'Bearer ' + token } });
+  if (!r.ok) { alert('Ошибка'); return; }
+  render(await r.json());
+}
+function render(tasks) {
+  const html = tasks.map(t => `
+    <a class="task-card" href="/tasks/${t.id}">
+      <div class="task-topic"><i class="fa-solid fa-folder-open"></i> ${t.topic}</div>
+      <div class="task-title">${t.title}</div>
+      <div class="task-meta"><span class="difficulty-badge difficulty-${t.difficulty_level}"><i class="fa-solid fa-signal"></i> ${t.difficulty_label}</span> ${t.difficulty} · <i class="fa-solid fa-star"></i> +${t.xp_reward} XP</div>
+    </a>`).join('');
+  document.getElementById('tasks-list').innerHTML = html || '<p>Нет задач по фильтру</p>';
+}
+loadTasks();
+</script>
+{% endblock %}

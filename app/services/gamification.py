@@ -1,0 +1,102 @@
+"""XP, уровни, streaks, достижения."""
+from datetime import datetime, timedelta
+from typing import List
+
+from sqlalchemy.orm import Session
+
+from app.models import Achievement, Attempt, User, UserAchievement
+
+
+def xp_for_level(level: int) -> int:
+    """Сколько суммарно XP нужно для достижения данного уровня."""
+    return int(100 * (level - 1) ** 1.5)
+
+
+def level_from_xp(xp: int) -> int:
+    level = 1
+    while xp_for_level(level + 1) <= xp:
+        level += 1
+    return level
+
+
+def update_streak(user: User, now: datetime) -> None:
+    today = now.date()
+    last = user.last_solved_at.date() if user.last_solved_at else None
+    if last == today:
+        return
+    if last == today - timedelta(days=1):
+        user.current_streak += 1
+    else:
+        user.current_streak = 1
+    user.longest_streak = max(user.longest_streak, user.current_streak)
+    user.last_solved_at = now
+
+
+DEFAULT_ACHIEVEMENTS = [
+    {"code": "first_blood", "title": "Первое решение", "description": "Решил первую задачу", "icon": "fa-solid fa-flag-checkered"},
+    {"code": "solver_10", "title": "Решатель", "description": "Решил 10 задач", "icon": "fa-solid fa-check-double"},
+    {"code": "solver_50", "title": "Мастер", "description": "Решил 50 задач", "icon": "fa-solid fa-graduation-cap"},
+    {"code": "streak_3", "title": "Три дня подряд", "description": "Серия 3 дня подряд", "icon": "fa-solid fa-fire-flame-curved"},
+    {"code": "streak_7", "title": "Неделя подряд", "description": "Серия 7 дней подряд", "icon": "fa-solid fa-calendar-check"},
+    {"code": "level_5", "title": "Пятый уровень", "description": "Достиг 5 уровня", "icon": "fa-solid fa-layer-group"},
+    {"code": "level_10", "title": "Десятый уровень", "description": "Достиг 10 уровня", "icon": "fa-solid fa-medal"},
+    {"code": "rating_1500", "title": "Рейтинг 1500", "description": "Рейтинг 1500+", "icon": "fa-solid fa-ranking-star"},
+]
+
+
+def ensure_achievements_seeded(db: Session) -> None:
+    existing = {a.code: a for a in db.query(Achievement).all()}
+    for a in DEFAULT_ACHIEVEMENTS:
+        achievement = existing.get(a["code"])
+        if achievement:
+            achievement.title = a["title"]
+            achievement.description = a["description"]
+            achievement.icon = a["icon"]
+        else:
+            db.add(Achievement(**a))
+    db.commit()
+
+
+def _unlock(db: Session, user: User, code: str) -> Achievement | None:
+    ach = db.query(Achievement).filter(Achievement.code == code).first()
+    if not ach:
+        return None
+    exists = (
+        db.query(UserAchievement)
+        .filter(UserAchievement.user_id == user.id, UserAchievement.achievement_id == ach.id)
+        .first()
+    )
+    if exists:
+        return None
+    db.add(UserAchievement(user_id=user.id, achievement_id=ach.id))
+    return ach
+
+
+def check_achievements(db: Session, user: User) -> List[Achievement]:
+    """Проверяет и выдаёт новые достижения. Возвращает список новых."""
+    unlocked: List[Achievement] = []
+    solved = db.query(Attempt).filter(Attempt.user_id == user.id, Attempt.is_correct == True).count()
+
+    checks = []
+    if solved >= 1:
+        checks.append("first_blood")
+    if solved >= 10:
+        checks.append("solver_10")
+    if solved >= 50:
+        checks.append("solver_50")
+    if user.current_streak >= 3:
+        checks.append("streak_3")
+    if user.current_streak >= 7:
+        checks.append("streak_7")
+    if user.level >= 5:
+        checks.append("level_5")
+    if user.level >= 10:
+        checks.append("level_10")
+    if user.rating >= 1500:
+        checks.append("rating_1500")
+
+    for code in checks:
+        ach = _unlock(db, user, code)
+        if ach:
+            unlocked.append(ach)
+    return unlocked

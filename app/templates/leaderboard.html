@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block content %}
+<h2><i class="fa-solid fa-ranking-star"></i> Рейтинг</h2>
+<div id="lb"></div>
+<script>
+fetch('/api/leaderboard?limit=50').then(r => r.json()).then(rows => {
+  document.getElementById('lb').innerHTML =
+    '<table class="lb"><tr><th>#</th><th>Игрок</th><th>Ур.</th><th>XP</th><th>Рейтинг</th></tr>' +
+    rows.map((u, i) => `<tr><td>${i + 1}</td><td><i class="fa-solid fa-user"></i> ${u.username}</td><td>${u.level}</td><td>${u.xp}</td><td>${u.rating}</td></tr>`).join('') +
+    '</table>';
+});
+</script>
+{% endblock %}
