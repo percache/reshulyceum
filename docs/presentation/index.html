@@ -90,21 +90,24 @@
   }
   .thanks-logo i { color: var(--accent); font-size: 1.2em; }
   .thanks-slide .subtitle { margin-bottom: 28px; }
-  .qr-block {
-    margin: 8px auto 0; display: inline-flex; align-items: center; gap: 24px;
+  .qr-row {
+    display: flex; gap: 22px; justify-content: center; margin-top: 12px; flex-wrap: wrap;
+  }
+  .qr-card {
+    display: flex; align-items: center; gap: 16px;
     background: var(--surface); border: 1px solid var(--border);
-    padding: 20px 28px; border-radius: 14px;
+    padding: 16px 20px; border-radius: 14px;
   }
   .qr-img {
-    width: 180px; height: 180px;
-    background: #ffffff; padding: 10px; border-radius: 10px;
+    width: 160px; height: 160px;
+    background: #ffffff; padding: 8px; border-radius: 8px;
     display: block;
   }
-  .qr-caption {
-    text-align: left; display: flex; flex-direction: column; gap: 2px;
-    font-size: 0.9em;
+  .qr-label {
+    text-align: left; display: flex; flex-direction: column; gap: 3px;
+    font-size: 0.88em;
   }
-  .qr-caption .muted { font-size: 0.78em; }
+  .qr-label .muted { font-size: 0.78em; }
 
   /* Cards */
   .cards { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 16px; }
@@ -755,11 +758,21 @@ def xp_for_level(L):
   </div>
   <h1 style="font-size:2.2em; margin-top:14px">Спасибо за внимание</h1>
   <p class="subtitle">Вопросы?</p>
-  <div class="qr-block">
-    <img src="qr.png" alt="QR — lic.deuveli.space/app/pz0/" class="qr-img">
-    <div class="qr-caption">
-      <span class="muted">Открыть презентацию</span>
-      <span>lic.deuveli.space/app/pz0</span>
+  <div class="qr-row">
+    <div class="qr-card">
+      <img src="qr-github.png" alt="QR — GitHub" class="qr-img">
+      <div class="qr-label">
+        <span class="muted">Репозиторий</span>
+        <span>github.com/percache/reshulyceum</span>
+      </div>
+    </div>
+    <div class="qr-card">
+      <img src="qr-site.png" alt="QR — сайт" class="qr-img">
+      <div class="qr-label">
+        <span class="muted">Сайт</span>
+        <span>lic.deuveli.space/app</span>
+        <span class="muted" style="margin-top:4px">Демо: <span class="accent">admin / admin123</span></span>
+      </div>
     </div>
   </div>
 </section>
