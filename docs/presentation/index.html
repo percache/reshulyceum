@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ReshuLyceum — презентация</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reset.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/highlight/monokai.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #14161c;
+    --surface: #1c1f27;
+    --surface-2: #242832;
+    --accent: #e8b14a;
+    --text: #e6e7eb;
+    --muted: #8c92a3;
+    --good: #5fb37a;
+    --bad: #d56b6b;
+    --border: #2a2e38;
+  }
+  .reveal, .reveal h1, .reveal h2, .reveal h3, .reveal h4, .reveal p, .reveal li, .reveal td, .reveal th, .reveal div { font-family: "Inter", "Roboto", "Helvetica Neue", "Liberation Sans", "DejaVu Sans", "Noto Sans", sans-serif; }
+  .reveal { color: var(--text); font-size: 24px; }
+  .reveal .slides { text-align: left; }
+  .reveal .slides section { padding: 24px 50px; }
+  /* override reveal.js dimming of inactive/past content */
+  .reveal .slides section.present,
+  .reveal .slides section.past,
+  .reveal .slides section.future { opacity: 1 !important; visibility: visible; }
+  .reveal .slides > section.stack { opacity: 1 !important; }
+  html, body { background: var(--bg) !important; }
+  .reveal-viewport { background: var(--bg) !important; }
+  html:not(.print-pdf) .reveal h1,
+  html:not(.print-pdf) .reveal h2,
+  html:not(.print-pdf) .reveal h3,
+  html:not(.print-pdf) .reveal h4 {
+    color: #ffffff !important; text-transform: none; letter-spacing: -0.01em;
+    font-weight: 700; margin-bottom: 18px;
+  }
+  html:not(.print-pdf) .reveal h3 { color: var(--accent) !important; }
+  .reveal h2 { border-bottom: 1px solid var(--border); padding-bottom: 12px; }
+  .reveal h1 { font-size: 2.4em; }
+  .reveal h2 { font-size: 1.55em; margin-bottom: 12px; }
+  .reveal h3 { font-size: 1.15em; color: var(--accent); margin-bottom: 10px; }
+  .reveal a { color: var(--accent); }
+  .reveal ul, .reveal ol { margin-left: 1.1em; }
+  .reveal li { margin: 6px 0; }
+  .reveal li b { color: var(--accent); font-weight: 600; }
+  .reveal pre {
+    box-shadow: none; background: var(--surface);
+    border: 1px solid var(--border); border-radius: 8px;
+    font-size: 0.62em;
+  }
+  .reveal code { font-family: "JetBrains Mono", "Courier New", monospace; }
+  .reveal table { border-collapse: collapse; font-size: 0.78em; }
+  .reveal table th, .reveal table td {
+    padding: 8px 14px; border-bottom: 1px solid var(--border); text-align: left;
+  }
+  .reveal table th { color: var(--muted); font-weight: 600; font-size: 0.85em; text-transform: uppercase; letter-spacing: 0.4px; }
+  .reveal .muted { color: var(--muted); }
+  .reveal .accent { color: var(--accent); }
+  .reveal .controls { color: var(--accent); }
+  .reveal .progress { color: var(--accent); }
+
+  /* Title slide */
+  .title-slide {
+    text-align: center !important;
+  }
+  .title-slide h1 {
+    font-size: 3em; margin-top: 30px;
+  }
+  .title-slide .brand-icon {
+    font-size: 64px; color: var(--accent); margin-bottom: 20px;
+  }
+  .title-slide .subtitle {
+    color: var(--muted); font-size: 1.1em; margin-top: 10px;
+  }
+  .title-slide .meta {
+    margin-top: 50px; color: var(--muted); font-size: 0.8em;
+  }
+
+  /* Cards */
+  .cards { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 16px; }
+  .cards.three { grid-template-columns: repeat(3, 1fr); }
+  .card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 10px; padding: 18px;
+  }
+  .card .ico {
+    width: 40px; height: 40px; display: grid; place-items: center;
+    background: var(--surface-2); color: var(--accent);
+    border-radius: 8px; margin-bottom: 10px; font-size: 18px;
+  }
+  .card h4 { margin: 0 0 6px; font-size: 1em; color: var(--text); }
+  .card p { margin: 0; color: var(--muted); font-size: 0.78em; line-height: 1.45; }
+
+  /* Stats */
+  .stats { display: flex; gap: 60px; justify-content: center; margin-top: 30px; }
+  .stat { text-align: center; }
+  .stat b { display: block; font-size: 2.2em; color: var(--accent); font-weight: 700; line-height: 1; }
+  .stat span { color: var(--muted); font-size: 0.7em; }
+
+  /* Tag */
+  .tag {
+    display: inline-block; padding: 3px 10px; border-radius: 4px;
+    background: var(--surface-2); color: var(--accent); font-size: 0.7em;
+    font-weight: 600; margin-right: 6px;
+  }
+  .tag.muted { color: var(--muted); }
+
+  /* Two columns */
+  .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; align-items: start; }
+
+  /* Slide number / footer */
+  .footer-note {
+    position: absolute; bottom: 12px; left: 50px; right: 50px;
+    color: var(--muted); font-size: 0.55em;
+    display: flex; justify-content: space-between;
+    border-top: 1px solid var(--border); padding-top: 8px;
+  }
+  .footer-note .accent { color: var(--accent); }
+
+  /* Code small */
+  .small-code pre { font-size: 0.52em; }
+
+  /* Lead text */
+  .lead { font-size: 1.05em; color: var(--muted); margin: 10px 0 16px; }
+
+  /* List checks */
+  .check-list { list-style: none; margin: 0; padding: 0; }
+  .check-list li { padding-left: 28px; position: relative; margin: 10px 0; }
+  .check-list li::before {
+    content: "\f00c"; font-family: "Font Awesome 6 Free"; font-weight: 900;
+    position: absolute; left: 0; top: 2px; color: var(--good); font-size: 0.85em;
+  }
+
+  /* Pipeline */
+  .pipeline { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin: 20px 0; }
+  .pipeline .step {
+    background: var(--surface); border: 1px solid var(--border);
+    padding: 10px 16px; border-radius: 8px; font-size: 0.78em;
+  }
+  .pipeline .step b { color: var(--accent); display: block; font-size: 0.85em; }
+  .pipeline .arrow { color: var(--muted); }
+
+  /* Layered architecture */
+  .layers { display: flex; flex-direction: column; gap: 8px; margin-top: 14px; }
+  .layer {
+    background: var(--surface); border: 1px solid var(--border);
+    padding: 12px 18px; border-radius: 8px; display: flex; align-items: center; gap: 14px;
+  }
+  .layer .l-name { color: var(--accent); font-weight: 600; min-width: 130px; font-size: 0.85em; }
+  .layer .l-desc { color: var(--muted); font-size: 0.78em; }
+
+  /* Demo steps */
+  .demo-steps { counter-reset: step; padding: 0; list-style: none; }
+  .demo-steps li {
+    counter-increment: step; padding: 10px 0 10px 50px; position: relative;
+    border-bottom: 1px dashed var(--border);
+  }
+  .demo-steps li:last-child { border-bottom: none; }
+  .demo-steps li::before {
+    content: counter(step); position: absolute; left: 0; top: 6px;
+    width: 32px; height: 32px; border-radius: 8px;
+    background: var(--surface-2); color: var(--accent);
+    display: grid; place-items: center; font-weight: 700; font-size: 0.85em;
+  }
+</style>
+</head>
+<body>
+<div class="reveal">
+<div class="slides">
+
+<!-- ============ TITLE ============ -->
+<section class="title-slide" data-background-color="#14161c">
+  <div class="brand-icon"><i class="fa-solid fa-bolt"></i></div>
+  <h1>ReshuLyceum</h1>
+  <p class="subtitle">Платформа подготовки к ЕГЭ по информатике<br>с адаптивной сложностью и геймификацией</p>
+  <p class="meta">
+    Итоговый проект · WebServer + REST API<br>
+    FastAPI · SQLAlchemy · Jinja2 · SQLite
+  </p>
+</section>
+
+<!-- ============ PROBLEM ============ -->
+<section>
+  <h2>Проблема</h2>
+  <p class="lead">Готовиться к ЕГЭ по информатике в одиночку — сложно:</p>
+  <ul>
+    <li>Сложно подобрать <b>задачи нужного уровня</b> — либо слишком легко, либо слишком сложно</li>
+    <li>Нет <b>обратной связи о прогрессе</b>: что освоено, а что западает</li>
+    <li>Низкая <b>мотивация</b> для регулярных занятий</li>
+    <li>Готовые тренажёры либо платные, либо без аналитики</li>
+  </ul>
+  <div class="footer-note"><span>ReshuLyceum</span><span>2 / 14</span></div>
+</section>
+
+<!-- ============ SOLUTION ============ -->
+<section>
+  <h2>Решение</h2>
+  <p class="lead">Веб-платформа, которая автоматически подстраивается под уровень ученика.</p>
+  <div class="cards">
+    <div class="card">
+      <div class="ico"><i class="fa-solid fa-sliders"></i></div>
+      <h4>Адаптивная сложность</h4>
+      <p>Алгоритм ELO подбирает задачи и обновляет рейтинг ученика и задачи после каждой попытки.</p>
+    </div>
+    <div class="card">
+      <div class="ico"><i class="fa-solid fa-trophy"></i></div>
+      <h4>Геймификация</h4>
+      <p>XP, уровни, серии дней подряд и 15 достижений мотивируют решать регулярно.</p>
+    </div>
+    <div class="card">
+      <div class="ico"><i class="fa-solid fa-chart-pie"></i></div>
+      <h4>Аналитика</h4>
+      <p>Статистика по темам, точность, история попыток и графики активности по дням.</p>
+    </div>
+    <div class="card">
+      <div class="ico"><i class="fa-solid fa-ranking-star"></i></div>
+      <h4>Сообщество</h4>
+      <p>Лидерборд, задача дня, рекомендации — соревновательный элемент.</p>
+    </div>
+  </div>
+  <div class="footer-note"><span>ReshuLyceum</span><span>3 / 14</span></div>
+</section>
+
+<!-- ============ STACK ============ -->
+<section>
+  <h2>Технологии</h2>
+  <div class="cols">
+    <div>
+      <h3>Backend</h3>
+      <ul>
+        <li><b>FastAPI</b> — REST API + автодоки</li>
+        <li><b>SQLAlchemy 2</b> — ORM</li>
+        <li><b>SQLite</b> — хранилище</li>
+        <li><b>Pydantic v2</b> — валидация</li>
+        <li><b>JWT</b> (python-jose) + <b>bcrypt</b></li>
+        <li><b>pytest</b> — 16 автотестов</li>
+      </ul>
+    </div>
+    <div>
+      <h3>Frontend</h3>
+      <ul>
+        <li><b>Jinja2</b> — шаблоны</li>
+        <li><b>Bootstrap 5</b> + собственный CSS</li>
+        <li><b>Chart.js</b> — графики профиля</li>
+        <li><b>Font Awesome</b> — иконки</li>
+        <li>Vanilla JS — без фреймворков</li>
+      </ul>
+      <h3 style="margin-top:18px">Деплой</h3>
+      <ul>
+        <li><b>Dockerfile</b> + <b>docker-compose</b></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-note"><span>ReshuLyceum</span><span>4 / 14</span></div>
+</section>
+
+<!-- ============ ARCHITECTURE ============ -->
+<section>
+  <h2>Архитектура: слои</h2>
+  <p class="lead">Чистое разделение ответственности — каждый слой решает одну задачу.</p>
+  <div class="layers">
+    <div class="layer">
+      <div class="l-name"><i class="fa-solid fa-globe"></i> web/routes</div>
+      <div class="l-desc">HTML-страницы через Jinja2 (index, tasks, profile, admin, …)</div>
+    </div>
+    <div class="layer">
+      <div class="l-name"><i class="fa-solid fa-code"></i> api/*</div>
+      <div class="l-desc">REST-эндпоинты: auth, tasks, attempts, stats — JSON и валидация</div>
+    </div>
+    <div class="layer">
+      <div class="l-name"><i class="fa-solid fa-shield-halved"></i> core</div>
+      <div class="l-desc">JWT, bcrypt, зависимости FastAPI (get_current_user / admin)</div>
+    </div>
+    <div class="layer">
+      <div class="l-name"><i class="fa-solid fa-gears"></i> services</div>
+      <div class="l-desc">Бизнес-логика: ELO-рейтинг, XP/уровни, streaks, достижения, проверка ответа</div>
+    </div>
+    <div class="layer">
+      <div class="l-name"><i class="fa-solid fa-database"></i> models</div>
+      <div class="l-desc">SQLAlchemy ORM: User, Task, Attempt, Achievement, UserAchievement</div>
+    </div>
+  </div>
+  <div class="footer-note"><span>ReshuLyceum</span><span>5 / 14</span></div>
+</section>
+
+<!-- ============ ELO ============ -->
+<section>
+  <h2>Алгоритм: адаптивная сложность (ELO)</h2>
+  <p class="lead">Шахматный рейтинг — но для пары «ученик / задача».</p>
+<pre><code class="language-python" data-trim>
+# app/services/rating.py
+K = 32  # коэффициент чувствительности
+
+def expected(user_r: int, task_r: int) -> float:
+    return 1 / (1 + 10 ** ((task_r - user_r) / 400))
+
+def update_ratings(user_r, task_r, won: bool):
+    e = expected(user_r, task_r)
+    delta = round(K * ((1 if won else 0) - e))
+    return user_r + delta, task_r - delta  # симметрично
+</code></pre>
+  <ul>
+    <li>Решил <b>сложную</b> задачу → +много рейтинга ученику, задача чуть «легчает»</li>
+    <li>Не решил <b>лёгкую</b> → −много рейтинга, задача чуть «тяжелеет»</li>
+    <li><b>/api/recommend</b> подбирает задачи с рейтингом, ближайшим к рейтингу ученика</li>
+  </ul>
+  <div class="footer-note"><span>ReshuLyceum</span><span>6 / 14</span></div>
+</section>
+
+<!-- ============ GAMIFICATION ============ -->
+<section>
+  <h2>Геймификация</h2>
+  <div class="cols">
+    <div>
+      <h3>XP и уровни</h3>
+<pre><code class="language-python" data-trim>
+def xp_for_level(L):
+    return int(100 * (L - 1) ** 1.5)
+</code></pre>
+      <p class="muted" style="font-size:0.8em">Нелинейный рост — следующий уровень даётся всё сложнее.</p>
+
+      <h3>Серии дней (streaks)</h3>
+      <ul style="font-size:0.85em">
+        <li>Решил вчера и сегодня → <b>+1</b> к серии</li>
+        <li>Пропустил день → серия <b>сбрасывается</b></li>
+        <li>Сохраняется <b>максимум</b></li>
+      </ul>
+    </div>
+    <div>
+      <h3>15 достижений</h3>
+      <ul style="font-size:0.82em">
+        <li><b>За количество:</b> 1 / 10 / 25 / 50 / 100 решённых</li>
+        <li><b>За серии:</b> 3 / 7 / 30 дней подряд</li>
+        <li><b>За уровни:</b> 5 / 10 / 20</li>
+        <li><b>За рейтинг:</b> 1500 / 2000</li>
+        <li><b>Снайпер:</b> точность ≥90% при 20+ попытках</li>
+        <li><b>Эрудит:</b> задачи по 5+ темам</li>
+        <li><b>Покоритель:</b> решил задачу сложности 1700+</li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-note"><span>ReshuLyceum</span><span>7 / 14</span></div>
+</section>
+
+<!-- ============ DATA MODEL ============ -->
+<section>
+  <h2>Модель данных</h2>
+<pre><code class="language-text" data-trim>
+User ──┬─< Attempt >──┬── Task
+       │              │
+       └─< UserAchievement >── Achievement
+
+User:        id, email, username, hashed_password, avatar_path,
+             is_admin, xp, level, rating, current_streak,
+             longest_streak, last_solved_at, created_at
+
+Task:        id, title, description, topic, difficulty (ELO),
+             answer (скрыт), explanation, xp_reward, created_at
+
+Attempt:     id, user_id, task_id, submitted_answer, is_correct,
+             xp_gained, rating_delta, created_at
+
+Achievement: id, code, title, description, icon
+</code></pre>
+  <p class="muted" style="font-size:0.78em">5 таблиц · все связи через ForeignKey · каскадное удаление</p>
+  <div class="footer-note"><span>ReshuLyceum</span><span>8 / 14</span></div>
+</section>
+
+<!-- ============ API ============ -->
+<section>
+  <h2>REST API</h2>
+  <p class="muted" style="font-size:0.8em">Полный список — на <span class="accent">/docs</span> (Swagger UI). Основное:</p>
+  <table>
+    <tr><th>Метод</th><th>URL</th><th>Описание</th></tr>
+    <tr><td><span class="tag">POST</span></td><td>/api/auth/register</td><td>регистрация</td></tr>
+    <tr><td><span class="tag">POST</span></td><td>/api/auth/login</td><td>JWT-токен</td></tr>
+    <tr><td><span class="tag">POST</span></td><td>/api/auth/me/avatar</td><td>загрузка аватара</td></tr>
+    <tr><td><span class="tag">POST</span></td><td>/api/auth/me/password</td><td>смена пароля</td></tr>
+    <tr><td><span class="tag">GET</span></td><td>/api/tasks?search&amp;topic&amp;difficulty_level&amp;solved</td><td>каталог с фильтрами</td></tr>
+    <tr><td><span class="tag">GET</span></td><td>/api/tasks/daily</td><td><b>задача дня</b></td></tr>
+    <tr><td><span class="tag">POST</span></td><td>/api/attempts</td><td>отправить ответ → автопроверка + XP</td></tr>
+    <tr><td><span class="tag">GET</span></td><td>/api/recommend</td><td>задачи под мой ELO-рейтинг</td></tr>
+    <tr><td><span class="tag">GET</span></td><td>/api/stats/me, /api/stats/me/timeline</td><td>аналитика и график активности</td></tr>
+    <tr><td><span class="tag">GET</span></td><td>/api/leaderboard, /api/me/achievements</td><td>рейтинг и достижения</td></tr>
+    <tr><td><span class="tag muted">CRUD</span></td><td>/api/tasks (POST / PATCH / DELETE)</td><td>только для admin</td></tr>
+  </table>
+  <div class="footer-note"><span>ReshuLyceum</span><span>9 / 14</span></div>
+</section>
+
+<!-- ============ SUBMIT FLOW ============ -->
+<section>
+  <h2>Сценарий: сдача ответа</h2>
+  <div class="pipeline">
+    <div class="step"><b>POST</b>/api/attempts</div>
+    <span class="arrow">→</span>
+    <div class="step"><b>checker</b>нормализация + сравнение</div>
+    <span class="arrow">→</span>
+    <div class="step"><b>rating</b>обновление ELO</div>
+    <span class="arrow">→</span>
+    <div class="step"><b>gamification</b>XP, level, streak</div>
+    <span class="arrow">→</span>
+    <div class="step"><b>achievements</b>проверка 15 условий</div>
+    <span class="arrow">→</span>
+    <div class="step"><b>JSON</b>результат + toast</div>
+  </div>
+  <p class="muted" style="font-size:0.8em">Один POST-запрос — пять последовательных бизнес-операций в транзакции.</p>
+
+  <h3>Проверка ответа — допускаются:</h3>
+  <ul style="font-size:0.85em">
+    <li>Регистр и лишние пробелы (<code>"  Yes "</code> = <code>"yes"</code>)</li>
+    <li>Запятая вместо точки (<code>3,14</code> = <code>3.14</code>)</li>
+    <li>Числовая близость до <code>1e-6</code> (для float)</li>
+  </ul>
+  <div class="footer-note"><span>ReshuLyceum</span><span>10 / 14</span></div>
+</section>
+
+<!-- ============ SECURITY ============ -->
+<section>
+  <h2>Безопасность</h2>
+  <ul class="check-list">
+    <li>Пароли хэшируются <b>bcrypt</b> (passlib)</li>
+    <li><b>JWT</b> с истечением 7 дней, подпись HS256</li>
+    <li><b>TaskPublic</b> не отдаёт эталонный ответ — только после правильного решения</li>
+    <li>Admin-эндпоинты защищены отдельной зависимостью <code>get_current_admin</code></li>
+    <li>Загрузка аватара ограничена: <b>JPG / PNG / WEBP</b>, до <b>2 МБ</b>, content-type валидируется</li>
+    <li>Валидация всех входов через <b>Pydantic</b> (логин — regex, email — RFC, длины, диапазоны)</li>
+    <li>SQL-инъекции исключены — везде ORM, параметризованные запросы</li>
+  </ul>
+  <div class="footer-note"><span>ReshuLyceum</span><span>11 / 14</span></div>
+</section>
+
+<!-- ============ DEMO ============ -->
+<section>
+  <h2>Демонстрация</h2>
+  <ol class="demo-steps">
+    <li><b>Главная</b> — заголовок, задача дня, статистика по базе</li>
+    <li><b>Регистрация → автовход</b> — переход в профиль</li>
+    <li><b>Каталог задач</b>: поиск, фильтр по теме / сложности / «нерешённые»</li>
+    <li><b>«Рекомендовать мне»</b> — ELO в действии</li>
+    <li>Сдать <b>неверный</b> → <b>верный</b> ответ — XP, рейтинг, toast-достижение</li>
+    <li><b>Профиль</b>: статы, прогресс-бар уровня, два графика, история, смена пароля</li>
+    <li><b>Лидерборд</b> с подсветкой своей строки</li>
+    <li><b>admin / admin123</b> — создание и редактирование задачи в админ-панели</li>
+    <li><b>/docs</b> — Swagger UI</li>
+    <li><b>pytest -v</b> — 16 проходящих тестов</li>
+  </ol>
+  <div class="footer-note"><span>ReshuLyceum</span><span>12 / 14</span></div>
+</section>
+
+<!-- ============ REQUIREMENTS COMPLIANCE ============ -->
+<section>
+  <h2>Соответствие критериям</h2>
+  <table style="width:100%">
+    <tr><th>Требование</th><th>Реализация</th></tr>
+    <tr><td>requirements.txt</td><td>13 пакетов, фиксированные версии</td></tr>
+    <tr><td>Bootstrap или аналог</td><td>Bootstrap 5 + собственный CSS</td></tr>
+    <tr><td>ORM-модели</td><td>SQLAlchemy: 5 моделей</td></tr>
+    <tr><td>Регистрация и авторизация</td><td>JWT, bcrypt, роли user/admin</td></tr>
+    <tr><td>Загрузка файлов</td><td>POST /api/auth/me/avatar</td></tr>
+    <tr><td>REST API</td><td>20+ эндпоинтов, Swagger /docs</td></tr>
+    <tr><td>Хранение данных</td><td>SQLite + автоматические миграции</td></tr>
+    <tr><td>Хостинг / развёртывание</td><td>Dockerfile + docker-compose.yml</td></tr>
+    <tr><td>Тесты</td><td>pytest, 16 тестов, всё зелёное</td></tr>
+    <tr><td>Документы</td><td>docs/: задание, пояснительная, план защиты, deployment</td></tr>
+  </table>
+  <div class="footer-note"><span>ReshuLyceum</span><span>13 / 14</span></div>
+</section>
+
+<!-- ============ NUMBERS / FUTURE ============ -->
+<section>
+  <h2>Итого и развитие</h2>
+  <div class="stats">
+    <div class="stat"><b>33</b><span>демо-задач</span></div>
+    <div class="stat"><b>9</b><span>тем</span></div>
+    <div class="stat"><b>15</b><span>достижений</span></div>
+    <div class="stat"><b>16</b><span>тестов</span></div>
+    <div class="stat"><b>20+</b><span>эндпоинтов</span></div>
+  </div>
+
+  <h3 style="margin-top:30px">Куда развивать</h3>
+  <div class="cards three">
+    <div class="card">
+      <div class="ico"><i class="fa-solid fa-file-import"></i></div>
+      <h4>Импорт задач</h4>
+      <p>Массовая загрузка из CSV/JSON в админ-панели.</p>
+    </div>
+    <div class="card">
+      <div class="ico"><i class="fa-solid fa-bookmark"></i></div>
+      <h4>Избранное</h4>
+      <p>Сохранять задачи и возвращаться к ним позже.</p>
+    </div>
+    <div class="card">
+      <div class="ico"><i class="fa-solid fa-comments"></i></div>
+      <h4>Комментарии и подсказки</h4>
+      <p>Обсуждение решений, пошаговые подсказки за XP.</p>
+    </div>
+  </div>
+  <div class="footer-note"><span>ReshuLyceum</span><span>14 / 14</span></div>
+</section>
+
+<!-- ============ THANKS ============ -->
+<section class="title-slide" data-background-color="#14161c">
+  <div class="brand-icon"><i class="fa-solid fa-bolt"></i></div>
+  <h1 style="font-size:2.4em">Спасибо за внимание</h1>
+  <p class="subtitle">Вопросы?</p>
+  <p class="meta">
+    github.com/percache/reshulyceum<br>
+    Демо-доступ: <span class="accent">admin / admin123</span>
+  </p>
+</section>
+
+</div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/highlight/highlight.js"></script>
+<script>
+  Reveal.initialize({
+    hash: true,
+    slideNumber: false,
+    transition: 'slide',
+    transitionSpeed: 'fast',
+    controls: true,
+    progress: true,
+    plugins: [ RevealHighlight ],
+    width: 1280,
+    height: 800,
+    margin: 0.04,
+    center: false,
+    minScale: 0.4,
+    maxScale: 1.2,
+  });
+</script>
+</body>
+</html>
