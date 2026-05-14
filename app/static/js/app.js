@@ -12,21 +12,21 @@
   function showLoggedIn(me) {
     login && (login.style.display = 'none');
     reg && (reg.style.display = 'none');
-    logout && (logout.style.display = 'inline');
-    profile && (profile.style.display = 'inline');
+    logout && (logout.style.display = 'inline-flex');
+    profile && (profile.style.display = 'inline-flex');
     homeRegister && (homeRegister.style.display = 'none');
-    homeProfile && (homeProfile.style.display = 'inline-block');
+    homeProfile && (homeProfile.style.display = 'inline-flex');
     if (homeStart) homeStart.innerHTML = '<i class="fa-solid fa-list-check"></i> Продолжить решать';
-    if (me && me.is_admin && admin) admin.style.display = 'inline';
+    if (me && me.is_admin && admin) admin.style.display = 'inline-flex';
   }
 
   function showLoggedOut() {
-    login && (login.style.display = 'inline');
-    reg && (reg.style.display = 'inline');
+    login && (login.style.display = 'inline-flex');
+    reg && (reg.style.display = 'inline-flex');
     logout && (logout.style.display = 'none');
     profile && (profile.style.display = 'none');
     admin && (admin.style.display = 'none');
-    homeRegister && (homeRegister.style.display = 'inline-block');
+    homeRegister && (homeRegister.style.display = 'inline-flex');
     homeProfile && (homeProfile.style.display = 'none');
   }
 
@@ -40,7 +40,9 @@
           showLoggedOut();
           return;
         }
+        window.__me = me;
         showLoggedIn(me);
+        document.dispatchEvent(new CustomEvent('me:loaded', { detail: me }));
       })
       .catch(() => showLoggedOut());
   } else {
@@ -51,6 +53,15 @@
     e.preventDefault();
     localStorage.removeItem('token');
     location.href = '/';
+  });
+
+  // Active nav link highlight
+  const path = location.pathname.replace(/\/$/, '') || '/';
+  document.querySelectorAll('[data-nav]').forEach(a => {
+    const target = a.dataset.nav;
+    if (target === path || (target !== '/' && path.startsWith(target))) {
+      a.classList.add('active');
+    }
   });
 
   // Theme toggle
@@ -68,7 +79,17 @@
     document.documentElement.dataset.theme = next;
     localStorage.setItem('theme', next);
     updateThemeIcon();
-    // Перерисовать графики если они есть
     if (location.pathname === '/profile') location.reload();
   });
+
+  // Toast helper
+  window.showToast = function (text, icon) {
+    const host = document.getElementById('toast-host');
+    if (!host) return;
+    const el = document.createElement('div');
+    el.className = 'toast';
+    el.innerHTML = `<i class="${icon || 'fa-solid fa-trophy'}"></i><div>${text}</div>`;
+    host.appendChild(el);
+    setTimeout(() => { el.classList.add('hide'); setTimeout(() => el.remove(), 350); }, 3600);
+  };
 })();

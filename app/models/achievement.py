@@ -1,4 +1,4 @@
-from datetime import datetime
+from app.core.security import utcnow
 
 from sqlalchemy import Column, DateTime, ForeignKey, Integer, String, UniqueConstraint
 from sqlalchemy.orm import relationship
@@ -25,7 +25,7 @@ class UserAchievement(Base):
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
     achievement_id = Column(Integer, ForeignKey("achievements.id", ondelete="CASCADE"), nullable=False)
-    unlocked_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+    unlocked_at = Column(DateTime, default=utcnow, nullable=False)
 
     user = relationship("User", back_populates="achievements")
     achievement = relationship("Achievement", back_populates="user_links")

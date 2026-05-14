@@ -1,9 +1,8 @@
-from datetime import datetime
-
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
 from app.core.deps import get_current_user
+from app.core.security import utcnow
 from app.database import get_db
 from app.models import Attempt, Task, User
 from app.schemas.attempt import AttemptCreate, AttemptHistoryItem, AttemptResult
@@ -52,7 +51,7 @@ def submit_attempt(
         task.difficulty = new_task_rating
         user.xp += xp_gained
         user.level = level_from_xp(user.xp)
-        update_streak(user, datetime.utcnow())
+        update_streak(user, utcnow())
     elif not is_correct:
         new_user_rating, new_task_rating = update_ratings(user.rating, task.difficulty, False)
         rating_delta_val = new_user_rating - user.rating
@@ -70,7 +69,7 @@ def submit_attempt(
     db.add(attempt)
     db.flush()
 
-    unlocked = check_achievements(db, user) if is_correct else []
+    unlocked = check_achievements(db, user, last_task=task) if is_correct else []
 
     db.commit()
     db.refresh(attempt)

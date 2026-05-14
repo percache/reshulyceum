@@ -75,8 +75,12 @@ tests/test_api.py        # автотесты
 | POST | `/api/auth/login` | логин (форма OAuth2) → JWT |
 | GET  | `/api/auth/me` | текущий пользователь |
 | POST | `/api/auth/me/avatar` | загрузить аватар |
-| GET  | `/api/tasks` | список задач (фильтры: topic, difficulty_level, difficulty) |
+| POST | `/api/auth/me/password` | смена пароля |
+| GET  | `/api/tasks` | список задач (фильтры: topic, difficulty_level, difficulty, search, solved) |
+| GET  | `/api/tasks/topics` | список тем |
 | GET  | `/api/tasks/difficulty-levels` | уровни сложности |
+| GET  | `/api/tasks/daily` | **задача дня** |
+| GET  | `/api/tasks/me/solved-ids` | id решённых мной задач |
 | GET  | `/api/tasks/{id}` | задача по id |
 | POST | `/api/tasks` | создать (admin) |
 | PATCH| `/api/tasks/{id}` | обновить (admin) |
@@ -84,9 +88,11 @@ tests/test_api.py        # автотесты
 | POST | `/api/attempts` | сдать решение → автопроверка + XP + достижения |
 | GET  | `/api/attempts/me` | мои попытки |
 | GET  | `/api/stats/me` | моя статистика |
+| GET  | `/api/stats/me/timeline` | XP/решённые по дням |
 | GET  | `/api/leaderboard` | топ игроков |
 | GET  | `/api/recommend` | рекомендуемые задачи под мой рейтинг |
-| GET  | `/api/me/achievements` | мои достижения |
+| GET  | `/api/me/achievements` | мои достижения (`?include_locked=true` — вкл. закрытые) |
+| GET  | `/api/health` | health-check |
 
 ## Алгоритмы
 

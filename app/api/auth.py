@@ -8,7 +8,7 @@ from app.core.deps import get_current_user
 from app.core.security import create_access_token, hash_password, verify_password
 from app.database import get_db
 from app.models import User
-from app.schemas.user import Token, UserCreate, UserOut
+from app.schemas.user import PasswordChange, Token, UserCreate, UserOut
 
 router = APIRouter(prefix="/api/auth", tags=["auth"])
 
@@ -69,6 +69,23 @@ async def upload_avatar(
     path.write_bytes(data)
 
     current.avatar_path = f"/static/uploads/avatars/{path.name}"
+    db.add(current)
+    db.commit()
+    db.refresh(current)
+    return current
+
+
+@router.post("/me/password", response_model=UserOut)
+def change_password(
+    payload: PasswordChange,
+    current: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    if not verify_password(payload.old_password, current.hashed_password):
+        raise HTTPException(status_code=400, detail="Old password is wrong")
+    if payload.old_password == payload.new_password:
+        raise HTTPException(status_code=400, detail="New password must differ")
+    current.hashed_password = hash_password(payload.new_password)
     db.add(current)
     db.commit()
     db.refresh(current)

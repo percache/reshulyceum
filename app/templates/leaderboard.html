@@ -1,13 +1,29 @@
 {% extends "base.html" %}
 {% block content %}
 <h2><i class="fa-solid fa-ranking-star"></i> Рейтинг</h2>
-<div id="lb"></div>
+<p class="muted">Топ-50 учеников по XP. Твоя строка подсвечивается, если ты в списке.</p>
+<div id="lb"><div class="empty"><span class="spinner"></span> Загрузка…</div></div>
 <script>
-fetch('/api/leaderboard?limit=50').then(r => r.json()).then(rows => {
+const MEDALS = ['🥇', '🥈', '🥉'];
+(async () => {
+  const token = localStorage.getItem('token');
+  let me = null;
+  if (token) {
+    me = await fetch('/api/auth/me', { headers: { Authorization: 'Bearer ' + token } }).then(r => r.ok ? r.json() : null);
+  }
+  const rows = await fetch('/api/leaderboard?limit=50').then(r => r.json());
+  if (!rows.length) {
+    document.getElementById('lb').innerHTML = '<div class="empty">Пока нет игроков</div>';
+    return;
+  }
   document.getElementById('lb').innerHTML =
     '<table class="lb"><tr><th>#</th><th>Игрок</th><th>Ур.</th><th>XP</th><th>Рейтинг</th></tr>' +
-    rows.map((u, i) => `<tr><td>${i + 1}</td><td><i class="fa-solid fa-user"></i> ${u.username}</td><td>${u.level}</td><td>${u.xp}</td><td>${u.rating}</td></tr>`).join('') +
+    rows.map((u, i) => {
+      const rank = i < 3 ? MEDALS[i] : (i + 1);
+      const cls = me && u.username === me.username ? 'me' : '';
+      return `<tr class="${cls}"><td>${rank}</td><td><i class="fa-solid fa-user"></i> ${u.username}</td><td>${u.level}</td><td>${u.xp}</td><td>${u.rating}</td></tr>`;
+    }).join('') +
     '</table>';
-});
+})();
 </script>
 {% endblock %}

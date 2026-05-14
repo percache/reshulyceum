@@ -1,4 +1,4 @@
-from datetime import datetime
+from app.core.security import utcnow
 
 from sqlalchemy import Column, DateTime, Integer, String, Text
 from sqlalchemy.orm import relationship
@@ -19,7 +19,7 @@ class Task(Base):
     explanation = Column(Text, nullable=True)
     xp_reward = Column(Integer, default=10, nullable=False)
 
-    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+    created_at = Column(DateTime, default=utcnow, nullable=False)
 
     attempts = relationship("Attempt", back_populates="task", cascade="all, delete-orphan")
 

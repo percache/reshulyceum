@@ -15,8 +15,20 @@
 
 <h3><i class="fa-solid fa-award"></i> Достижения</h3>
 <div id="achievements" class="ach-grid"></div>
-<h3><i class="fa-solid fa-clock-rotate-left"></i> Последние попытки</h3>
+<div class="section-title"><h3><i class="fa-solid fa-clock-rotate-left"></i> Последние попытки</h3></div>
 <div id="history"></div>
+
+<div class="section-title"><h3><i class="fa-solid fa-key"></i> Смена пароля</h3></div>
+<div class="card">
+  <form id="pw-form" class="admin-form" autocomplete="off">
+    <div class="row">
+      <input name="old_password" type="password" placeholder="Текущий пароль" required minlength="6">
+      <input name="new_password" type="password" placeholder="Новый пароль (мин. 6 символов)" required minlength="6">
+      <button class="btn primary" type="submit"><i class="fa-solid fa-check"></i> Обновить</button>
+    </div>
+    <p id="pw-msg" class="muted" style="margin:0"></p>
+  </form>
+</div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
 <script>
@@ -28,7 +40,7 @@ async function load() {
   const [me, stats, ach, hist, timeline] = await Promise.all([
     fetch('/api/auth/me', { headers: h }).then(r => r.json()),
     fetch('/api/stats/me', { headers: h }).then(r => r.json()),
-    fetch('/api/me/achievements', { headers: h }).then(r => r.json()),
+    fetch('/api/me/achievements?include_locked=true', { headers: h }).then(r => r.json()),
     fetch('/api/attempts/me?limit=20', { headers: h }).then(r => r.json()),
     fetch('/api/stats/me/timeline?days=14', { headers: h }).then(r => r.json()),
   ]);
@@ -70,9 +82,10 @@ async function load() {
   drawTimeline(timeline);
   drawTopics(stats.by_topic);
 
-  document.getElementById('achievements').innerHTML = ach.length
-    ? ach.map(a => `<div class="ach-card"><i class="${a.icon || 'fa-solid fa-award'} ach-ico"></i><b>${a.title}</b><span>${a.description}</span></div>`).join('')
-    : '<p class="muted">Пока нет. Реши задачу, чтобы получить первое.</p>';
+  const sortedAch = ach.slice().sort((a, b) => Number(b.unlocked) - Number(a.unlocked));
+  document.getElementById('achievements').innerHTML = sortedAch.length
+    ? sortedAch.map(a => `<div class="ach-card ${a.unlocked ? '' : 'locked'}" title="${a.unlocked ? 'Получено' : 'Закрыто'}"><i class="${a.icon || 'fa-solid fa-award'} ach-ico"></i><b>${a.title}</b><span>${a.description}</span></div>`).join('')
+    : '<p class="muted">Список достижений пуст.</p>';
 
   document.getElementById('history').innerHTML = hist.length
     ? '<table class="history"><tr><th>Задача</th><th>Результат</th><th>XP</th></tr>' +
@@ -84,10 +97,10 @@ async function load() {
 function chartColors() {
   const isLight = document.documentElement.dataset.theme === 'light';
   return {
-    text: isLight ? '#1a1d28' : '#e8eaf0',
-    grid: isLight ? 'rgba(0,0,0,0.08)' : 'rgba(255,255,255,0.08)',
-    accent: '#ffcc00',
-    accent2: '#ff5e57',
+    text: isLight ? '#1f2330' : '#e6e7eb',
+    grid: isLight ? 'rgba(0,0,0,0.06)' : 'rgba(255,255,255,0.06)',
+    accent: isLight ? '#b07d20' : '#e8b14a',
+    muted: isLight ? '#8c92a3' : '#6b7180',
   };
 }
 
@@ -103,17 +116,22 @@ function drawTimeline(data) {
           label: 'XP за день',
           data: data.map(d => d.xp),
           borderColor: c.accent,
-          backgroundColor: 'rgba(255,204,0,0.15)',
-          tension: 0.3,
+          backgroundColor: 'rgba(232, 177, 74, 0.12)',
+          tension: 0.25,
           fill: true,
+          borderWidth: 2,
+          pointRadius: 2,
         },
         {
           label: 'Решено',
           data: data.map(d => d.solved),
-          borderColor: c.accent2,
-          backgroundColor: 'rgba(255,94,87,0.1)',
-          tension: 0.3,
+          borderColor: c.muted,
+          backgroundColor: 'transparent',
+          borderDash: [4, 4],
+          tension: 0.25,
           yAxisID: 'y2',
+          borderWidth: 1.5,
+          pointRadius: 2,
         },
       ],
     },
@@ -143,7 +161,12 @@ function drawTopics(byTopic) {
       labels,
       datasets: [{
         data: values,
-        backgroundColor: ['#ffcc00', '#ff5e57', '#4ade80', '#60a5fa', '#a78bfa', '#f472b6', '#34d399', '#fbbf24', '#fb923c'],
+        backgroundColor: [
+          '#e8b14a', '#8c92a3', '#5fb37a', '#6b8aa6',
+          '#b07d20', '#a87878', '#7a8c75', '#5d6a7d', '#9c8a5d',
+        ],
+        borderColor: 'transparent',
+        borderWidth: 0,
       }],
     },
     options: {
@@ -154,6 +177,31 @@ function drawTopics(byTopic) {
 }
 
 load();
+
+function setupPwForm() {
+  const f = document.getElementById('pw-form');
+  f && f.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const fd = new FormData(f);
+    const token = localStorage.getItem('token');
+    const r = await fetch('/api/auth/me/password', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
+      body: JSON.stringify({ old_password: fd.get('old_password'), new_password: fd.get('new_password') }),
+    });
+    const msg = document.getElementById('pw-msg');
+    if (r.ok) {
+      msg.textContent = 'Пароль обновлён';
+      msg.style.color = 'var(--good)';
+      f.reset();
+    } else {
+      const err = await r.json().catch(() => ({}));
+      msg.textContent = err.detail || 'Ошибка';
+      msg.style.color = 'var(--bad)';
+    }
+  });
+}
+setupPwForm();
 
 async function uploadAvatar(e) {
   e.preventDefault();

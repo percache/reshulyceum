@@ -4,7 +4,7 @@ from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
 
 from app.database import get_db
-from app.models import Task, User
+from app.models import Attempt, Task, User
 
 router = APIRouter(tags=["web"])
 templates = Jinja2Templates(directory="app/templates")
@@ -14,9 +14,15 @@ templates = Jinja2Templates(directory="app/templates")
 def index(request: Request, db: Session = Depends(get_db)):
     total_tasks = db.query(Task).count()
     total_users = db.query(User).count()
+    total_attempts = db.query(Attempt).count()
     return templates.TemplateResponse(
         "index.html",
-        {"request": request, "total_tasks": total_tasks, "total_users": total_users},
+        {
+            "request": request,
+            "total_tasks": total_tasks,
+            "total_users": total_users,
+            "total_attempts": total_attempts,
+        },
     )
 
 

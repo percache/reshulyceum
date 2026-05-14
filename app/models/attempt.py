@@ -1,4 +1,4 @@
-from datetime import datetime
+from app.core.security import utcnow
 
 from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer, String
 from sqlalchemy.orm import relationship
@@ -16,7 +16,7 @@ class Attempt(Base):
     is_correct = Column(Boolean, default=False, nullable=False)
     xp_gained = Column(Integer, default=0, nullable=False)
     rating_delta = Column(Integer, default=0, nullable=False)
-    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+    created_at = Column(DateTime, default=utcnow, nullable=False)
 
     user = relationship("User", back_populates="attempts")
     task = relationship("Task", back_populates="attempts")

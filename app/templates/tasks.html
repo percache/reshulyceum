@@ -2,6 +2,7 @@
 {% block content %}
 <h2><i class="fa-solid fa-list-check"></i> Каталог задач</h2>
 <div class="filter-bar">
+  <input id="filter-search" type="search" placeholder="🔎 Поиск по названию…">
   <select id="filter-topic">
     <option value="">Все темы</option>
     {% for t in topics %}<option value="{{ t }}">{{ t }}</option>{% endfor %}
@@ -14,27 +15,48 @@
     <option value="hard">Сложно</option>
     <option value="expert">Очень сложно</option>
   </select>
-  <input id="filter-min" type="number" placeholder="Сложность от" min="100">
-  <input id="filter-max" type="number" placeholder="до" max="3000">
-  <button class="btn" onclick="loadTasks()"><i class="fa-solid fa-filter"></i> Применить</button>
+  <select id="filter-solved">
+    <option value="">Все задачи</option>
+    <option value="false">Нерешённые</option>
+    <option value="true">Решённые</option>
+  </select>
   <button class="btn primary" onclick="recommend()"><i class="fa-solid fa-wand-magic-sparkles"></i> Рекомендовать мне</button>
+  <button class="btn" onclick="resetFilters()"><i class="fa-solid fa-rotate-left"></i> Сброс</button>
 </div>
 <div id="tasks-list" class="task-grid"></div>
 
 <script>
+let solvedSet = new Set();
+let debounceT;
+
+function debounce(fn, ms) { return (...a) => { clearTimeout(debounceT); debounceT = setTimeout(() => fn(...a), ms); }; }
+
+async function loadSolved() {
+  const token = localStorage.getItem('token');
+  if (!token) return;
+  try {
+    const ids = await fetch('/api/tasks/me/solved-ids', { headers: { Authorization: 'Bearer ' + token } }).then(r => r.ok ? r.json() : []);
+    solvedSet = new Set(ids);
+  } catch (e) {}
+}
+
 async function loadTasks() {
   const params = new URLSearchParams();
   const topic = document.getElementById('filter-topic').value;
   const level = document.getElementById('filter-level').value;
-  const min = document.getElementById('filter-min').value;
-  const max = document.getElementById('filter-max').value;
+  const search = document.getElementById('filter-search').value.trim();
+  const solved = document.getElementById('filter-solved').value;
   if (topic) params.append('topic', topic);
   if (level) params.append('difficulty_level', level);
-  if (min) params.append('min_difficulty', min);
-  if (max) params.append('max_difficulty', max);
-  const r = await fetch('/api/tasks?' + params.toString());
+  if (search) params.append('search', search);
+  if (solved) params.append('solved', solved);
+  params.append('limit', '200');
+  const token = localStorage.getItem('token');
+  const headers = token ? { Authorization: 'Bearer ' + token } : {};
+  const r = await fetch('/api/tasks?' + params.toString(), { headers });
   render(await r.json());
 }
+
 async function recommend() {
   const token = localStorage.getItem('token');
   if (!token) { alert('Сначала войди в аккаунт'); location.href='/login'; return; }
@@ -42,15 +64,39 @@ async function recommend() {
   if (!r.ok) { alert('Ошибка'); return; }
   render(await r.json());
 }
+
+function resetFilters() {
+  document.getElementById('filter-search').value = '';
+  document.getElementById('filter-topic').value = '';
+  document.getElementById('filter-level').value = '';
+  document.getElementById('filter-solved').value = '';
+  loadTasks();
+}
+
 function render(tasks) {
+  if (!tasks.length) {
+    document.getElementById('tasks-list').innerHTML = '<div class="empty">Нет задач по фильтру</div>';
+    return;
+  }
   const html = tasks.map(t => `
     <a class="task-card" href="/tasks/${t.id}">
+      ${solvedSet.has(t.id) ? '<span class="solved-badge"><i class="fa-solid fa-check"></i> решено</span>' : ''}
       <div class="task-topic"><i class="fa-solid fa-folder-open"></i> ${t.topic}</div>
       <div class="task-title">${t.title}</div>
-      <div class="task-meta"><span class="difficulty-badge difficulty-${t.difficulty_level}"><i class="fa-solid fa-signal"></i> ${t.difficulty_label}</span> ${t.difficulty} · <i class="fa-solid fa-star"></i> +${t.xp_reward} XP</div>
+      <div class="task-meta">
+        <span class="difficulty-badge difficulty-${t.difficulty_level}"><i class="fa-solid fa-signal"></i> ${t.difficulty_label}</span>
+        <span>${t.difficulty}</span>
+        <span><i class="fa-solid fa-star"></i> +${t.xp_reward} XP</span>
+      </div>
     </a>`).join('');
-  document.getElementById('tasks-list').innerHTML = html || '<p>Нет задач по фильтру</p>';
+  document.getElementById('tasks-list').innerHTML = html;
 }
-loadTasks();
+
+document.getElementById('filter-search').addEventListener('input', debounce(loadTasks, 300));
+document.getElementById('filter-topic').addEventListener('change', loadTasks);
+document.getElementById('filter-level').addEventListener('change', loadTasks);
+document.getElementById('filter-solved').addEventListener('change', loadTasks);
+
+(async () => { await loadSolved(); await loadTasks(); })();
 </script>
 {% endblock %}

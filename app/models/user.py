@@ -1,4 +1,4 @@
-from datetime import datetime
+from app.core.security import utcnow
 
 from sqlalchemy import Column, DateTime, Integer, String, Boolean
 from sqlalchemy.orm import relationship
@@ -23,7 +23,7 @@ class User(Base):
     longest_streak = Column(Integer, default=0, nullable=False)
     last_solved_at = Column(DateTime, nullable=True)
 
-    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+    created_at = Column(DateTime, default=utcnow, nullable=False)
 
     attempts = relationship("Attempt", back_populates="user", cascade="all, delete-orphan")
     achievements = relationship("UserAchievement", back_populates="user", cascade="all, delete-orphan")

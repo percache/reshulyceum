@@ -1,10 +1,11 @@
-from datetime import datetime, timedelta
+from datetime import timedelta
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import func
 from sqlalchemy.orm import Session
 
 from app.core.deps import get_current_user
+from app.core.security import utcnow
 from app.database import get_db
 from app.models import Attempt, Task, User, UserAchievement, Achievement
 from app.schemas.attempt import UserStats
@@ -72,7 +73,7 @@ def recommend(
 @router.get("/stats/me/timeline")
 def my_timeline(days: int = 14, db: Session = Depends(get_db), user: User = Depends(get_current_user)):
     """XP и кол-во решённых задач по дням за последние N дней."""
-    since = datetime.utcnow() - timedelta(days=days - 1)
+    since = utcnow() - timedelta(days=days - 1)
     attempts = (
         db.query(Attempt)
         .filter(Attempt.user_id == user.id, Attempt.created_at >= since)
@@ -96,7 +97,29 @@ def my_timeline(days: int = 14, db: Session = Depends(get_db), user: User = Depe
 
 
 @router.get("/me/achievements")
-def my_achievements(db: Session = Depends(get_db), user: User = Depends(get_current_user)):
+def my_achievements(
+    include_locked: bool = False,
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+):
+    unlocked_map = {
+        ua.achievement_id: ua.unlocked_at
+        for ua in db.query(UserAchievement).filter(UserAchievement.user_id == user.id).all()
+    }
+    if include_locked:
+        all_ach = db.query(Achievement).order_by(Achievement.id).all()
+        return [
+            {
+                "code": a.code,
+                "title": a.title,
+                "description": a.description,
+                "icon": a.icon,
+                "unlocked_at": unlocked_map.get(a.id),
+                "unlocked": a.id in unlocked_map,
+            }
+            for a in all_ach
+        ]
+
     rows = (
         db.query(Achievement, UserAchievement.unlocked_at)
         .join(UserAchievement, UserAchievement.achievement_id == Achievement.id)
@@ -111,6 +134,7 @@ def my_achievements(db: Session = Depends(get_db), user: User = Depends(get_curr
             "description": a.description,
             "icon": a.icon,
             "unlocked_at": dt,
+            "unlocked": True,
         }
         for a, dt in rows
     ]

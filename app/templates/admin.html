@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block content %}
 <h2><i class="fa-solid fa-shield-halved"></i> Админ-панель</h2>
-<div id="admin-gate" class="muted">Проверка прав…</div>
+<div id="admin-gate" class="muted"><span class="spinner"></span> Проверка прав…</div>
 
 <div id="admin-content" style="display:none">
   <section class="admin-section">
@@ -34,30 +34,65 @@
   </section>
 </div>
 
+<!-- Edit modal -->
+<div class="modal fade" id="editModal" tabindex="-1">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content" style="background:var(--surface-solid);color:var(--text);border:1px solid var(--border)">
+      <div class="modal-header">
+        <h5 class="modal-title"><i class="fa-solid fa-pen-to-square"></i> Редактирование задачи <span id="edit-id"></span></h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <form id="edit-form" class="admin-form">
+          <input name="title" placeholder="Название">
+          <input name="topic" placeholder="Тема">
+          <textarea name="description" rows="4" placeholder="Условие"></textarea>
+          <div class="row">
+            <input name="difficulty" type="number" min="100" max="3000" placeholder="Сложность">
+            <input name="xp_reward" type="number" min="1" max="1000" placeholder="XP">
+          </div>
+          <input name="answer" placeholder="Эталонный ответ">
+          <textarea name="explanation" rows="2" placeholder="Объяснение"></textarea>
+          <p id="edit-msg" class="muted" style="margin:0"></p>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn" data-bs-dismiss="modal">Отмена</button>
+        <button class="btn primary" id="edit-save"><i class="fa-solid fa-check"></i> Сохранить</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script>
 const token = localStorage.getItem('token');
 const h = { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' };
+let editModal;
 
 async function init() {
   if (!token) { location.href = '/login'; return; }
   const me = await fetch('/api/auth/me', { headers: h }).then(r => r.json()).catch(() => null);
   if (!me || !me.is_admin) {
-    document.getElementById('admin-gate').textContent = 'Доступ только для администраторов';
+    document.getElementById('admin-gate').innerHTML = '<div class="empty"><i class="fa-solid fa-lock"></i> Доступ только для администраторов</div>';
     return;
   }
   document.getElementById('admin-gate').style.display = 'none';
   document.getElementById('admin-content').style.display = 'block';
+  editModal = new bootstrap.Modal(document.getElementById('editModal'));
   loadTasks();
 }
 
 async function loadTasks() {
-  const tasks = await fetch('/api/tasks?limit=200', { headers: h }).then(r => r.json());
+  const tasks = await fetch('/api/tasks?limit=500', { headers: h }).then(r => r.json());
   document.getElementById('admin-tasks').innerHTML =
     '<table class="lb"><tr><th>ID</th><th>Тема</th><th>Название</th><th>Сложн.</th><th>XP</th><th></th></tr>' +
     tasks.map(t => `<tr>
       <td>${t.id}</td><td>${t.topic}</td><td>${t.title}</td>
       <td><span class="difficulty-badge difficulty-${t.difficulty_level}">${t.difficulty_label}</span> ${t.difficulty}</td><td>${t.xp_reward}</td>
-      <td><button class="btn" onclick="delTask(${t.id})"><i class="fa-solid fa-trash"></i> удалить</button></td>
+      <td>
+        <button class="btn sm" onclick="openEdit(${t.id})"><i class="fa-solid fa-pen"></i></button>
+        <button class="btn sm danger" onclick="delTask(${t.id})"><i class="fa-solid fa-trash"></i></button>
+      </td>
     </tr>`).join('') + '</table>';
 }
 
@@ -70,6 +105,50 @@ async function delTask(id) {
   const r = await fetch('/api/tasks/' + id, { method: 'DELETE', headers: h });
   if (r.ok) loadTasks(); else alert('Ошибка удаления');
 }
+
+async function openEdit(id) {
+  // load with admin context — use TaskFull from /api/tasks (TaskPublic) + answer fetched via admin patch endpoint workaround.
+  // We fetch the public version; admin can edit any field.
+  const t = await fetch('/api/tasks/' + id).then(r => r.json());
+  document.getElementById('edit-id').textContent = '#' + id;
+  const f = document.getElementById('edit-form');
+  f.dataset.id = id;
+  f.title.value = t.title;
+  f.topic.value = t.topic;
+  f.description.value = t.description;
+  f.difficulty.value = t.difficulty;
+  f.xp_reward.value = t.xp_reward;
+  f.answer.value = '';
+  f.answer.placeholder = 'Ответ (оставь пустым, чтобы не менять)';
+  f.explanation.value = '';
+  f.explanation.placeholder = 'Объяснение (оставь пустым, чтобы не менять)';
+  document.getElementById('edit-msg').textContent = '';
+  editModal.show();
+}
+
+document.getElementById('edit-save').addEventListener('click', async () => {
+  const f = document.getElementById('edit-form');
+  const id = f.dataset.id;
+  const payload = {
+    title: f.title.value || undefined,
+    topic: f.topic.value || undefined,
+    description: f.description.value || undefined,
+    difficulty: f.difficulty.value ? parseInt(f.difficulty.value) : undefined,
+    xp_reward: f.xp_reward.value ? parseInt(f.xp_reward.value) : undefined,
+    answer: f.answer.value || undefined,
+    explanation: f.explanation.value || undefined,
+  };
+  Object.keys(payload).forEach(k => payload[k] === undefined && delete payload[k]);
+  const r = await fetch('/api/tasks/' + id, { method: 'PATCH', headers: h, body: JSON.stringify(payload) });
+  if (r.ok) {
+    editModal.hide();
+    loadTasks();
+  } else {
+    const err = await r.json().catch(() => ({}));
+    document.getElementById('edit-msg').textContent = err.detail || 'Ошибка';
+    document.getElementById('edit-msg').style.color = 'var(--bad)';
+  }
+});
 
 document.getElementById('create-form').addEventListener('submit', async (e) => {
   e.preventDefault();

@@ -16,6 +16,7 @@ async function load() {
       <form id="submit-form" class="answer-form">
         <input id="answer" placeholder="Твой ответ" required autocomplete="off">
         <button class="btn primary" type="submit"><i class="fa-solid fa-paper-plane"></i> Отправить</button>
+        <a class="btn" href="/tasks"><i class="fa-solid fa-arrow-left"></i> К списку</a>
       </form>
       <div id="result"></div>
     </div>`;
@@ -43,6 +44,7 @@ async function submitAnswer(e) {
   if (res.explanation) html += `<div class="explanation">${res.explanation}</div>`;
   if (res.unlocked_achievements && res.unlocked_achievements.length) {
     html += `<div class="ach"><i class="fa-solid fa-award"></i> Получено: ${res.unlocked_achievements.join(', ')}</div>`;
+    res.unlocked_achievements.forEach(t => window.showToast && window.showToast('Достижение: <b>' + t + '</b>', 'fa-solid fa-trophy'));
   }
   document.getElementById('result').innerHTML = html;
 }

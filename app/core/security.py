@@ -31,3 +31,8 @@ def decode_token(token: str) -> Optional[str]:
         return payload.get("sub")
     except JWTError:
         return None
+
+
+def utcnow():
+    """Timezone-aware UTC datetime — replacement for deprecated datetime.utcnow()."""
+    return datetime.now(timezone.utc).replace(tzinfo=None)

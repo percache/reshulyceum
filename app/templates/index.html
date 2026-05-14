@@ -2,7 +2,8 @@
 {% block content %}
 <section class="hero">
   <h1>ReshuLyceum</h1>
-  <p class="subtitle">Тренажёр для подготовки к ЕГЭ по информатике. Решай задачи, повышай рейтинг, отслеживай прогресс.</p>
+  <p class="subtitle">Тренажёр для подготовки к ЕГЭ по информатике.
+  Адаптивная сложность, баллы опыта, достижения и рейтинг — всё в одном месте.</p>
   <div class="cta">
     <a class="btn primary" id="home-start" href="/tasks"><i class="fa-solid fa-play"></i> Начать решать</a>
     <a class="btn ghost" id="home-register" href="/register"><i class="fa-solid fa-user-plus"></i> Регистрация</a>
@@ -10,31 +11,51 @@
   </div>
 </section>
 
+<div id="daily-mount"></div>
+
 <section class="features">
   <div class="card">
     <div class="feature-icon"><i class="fa-solid fa-sliders"></i></div>
     <h3>Адаптивная сложность</h3>
-    <p>Алгоритм ELO подбирает задачи под твой уровень.</p>
+    <p class="muted">Алгоритм ELO подбирает задачи под твой уровень и обновляет рейтинг после каждой попытки.</p>
   </div>
   <div class="card">
     <div class="feature-icon"><i class="fa-solid fa-chart-line"></i></div>
     <h3>Прогресс</h3>
-    <p>Опыт, уровни, серии дней подряд, достижения.</p>
+    <p class="muted">Опыт, уровни, серии дней подряд и 15 достижений — мотивация решать больше.</p>
   </div>
   <div class="card">
     <div class="feature-icon"><i class="fa-solid fa-chart-pie"></i></div>
     <h3>Аналитика</h3>
-    <p>Статистика по темам: где силён, а где надо подтянуть.</p>
+    <p class="muted">Статистика по темам и дням: видно, где силён, а где надо подтянуть.</p>
   </div>
   <div class="card">
     <div class="feature-icon"><i class="fa-solid fa-trophy"></i></div>
     <h3>Рейтинг</h3>
-    <p>Сравнивай результаты с другими учениками.</p>
+    <p class="muted">Сравнивай результаты с другими учениками в таблице лидеров.</p>
   </div>
 </section>
 
 <section class="stats-bar">
-  <div><i class="fa-solid fa-book-open"></i> <b>{{ total_tasks }}</b> задач</div>
-  <div><i class="fa-solid fa-users"></i> <b>{{ total_users }}</b> учеников</div>
+  <div><b>{{ total_tasks }}</b><span><i class="fa-solid fa-book-open"></i> задач в базе</span></div>
+  <div><b>{{ total_users }}</b><span><i class="fa-solid fa-users"></i> учеников</span></div>
+  <div><b>{{ total_attempts }}</b><span><i class="fa-solid fa-pen-to-square"></i> попыток</span></div>
 </section>
+
+<script>
+(async () => {
+  try {
+    const t = await fetch('/api/tasks/daily').then(r => r.ok ? r.json() : null);
+    if (!t) return;
+    document.getElementById('daily-mount').innerHTML = `
+      <div class="daily-banner">
+        <div>
+          <h4><i class="fa-solid fa-calendar-star"></i> Задача дня</h4>
+          <p class="desc">${t.title} · <span class="difficulty-badge difficulty-${t.difficulty_level}">${t.difficulty_label}</span> · +${t.xp_reward} XP</p>
+        </div>
+        <a href="/tasks/${t.id}" class="btn primary"><i class="fa-solid fa-play"></i> Решить</a>
+      </div>`;
+  } catch (e) {}
+})();
+</script>
 {% endblock %}
