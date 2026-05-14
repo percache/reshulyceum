@@ -82,6 +82,29 @@
   .title-slide .meta {
     margin-top: 50px; color: var(--muted); font-size: 0.8em;
   }
+  /* Final "thanks" slide with QR */
+  .thanks-slide { text-align: center !important; }
+  .thanks-logo {
+    display: inline-flex; align-items: center; gap: 14px;
+    font-size: 2em; font-weight: 800; color: var(--text);
+  }
+  .thanks-logo i { color: var(--accent); font-size: 1.2em; }
+  .thanks-slide .subtitle { margin-bottom: 28px; }
+  .qr-block {
+    margin: 8px auto 0; display: inline-flex; align-items: center; gap: 24px;
+    background: var(--surface); border: 1px solid var(--border);
+    padding: 20px 28px; border-radius: 14px;
+  }
+  .qr-img {
+    width: 180px; height: 180px;
+    background: #ffffff; padding: 10px; border-radius: 10px;
+    display: block;
+  }
+  .qr-caption {
+    text-align: left; display: flex; flex-direction: column; gap: 2px;
+    font-size: 0.9em;
+  }
+  .qr-caption .muted { font-size: 0.78em; }
 
   /* Cards */
   .cards { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 16px; }
@@ -725,14 +748,21 @@ def xp_for_level(L):
 </section>
 
 <!-- ============ THANKS ============ -->
-<section class="title-slide" data-background-color="#14161c">
-  <div class="brand-icon"><i class="fa-solid fa-bolt"></i></div>
-  <h1 style="font-size:2.4em">Спасибо за внимание</h1>
+<section class="title-slide thanks-slide" data-background-color="#14161c">
+  <div class="thanks-logo">
+    <i class="fa-solid fa-bolt"></i>
+    <span>ReshuLyceum</span>
+  </div>
+  <h1 style="font-size:2.2em; margin-top:14px">Спасибо за внимание</h1>
   <p class="subtitle">Вопросы?</p>
-  <p class="meta">
-    github.com/percache/reshulyceum<br>
-    Демо-доступ: <span class="accent">admin / admin123</span>
-  </p>
+  <div class="qr-block">
+    <img src="qr.png" alt="QR — github.com/percache/reshulyceum" class="qr-img">
+    <div class="qr-caption">
+      <span class="muted">Открыть репозиторий</span>
+      <span>github.com/percache/reshulyceum</span>
+      <span class="muted" style="margin-top:8px">Демо-доступ: <span class="accent">admin / admin123</span></span>
+    </div>
+  </div>
 </section>
 
 </div>
