@@ -99,10 +99,10 @@
   .card p { margin: 0; color: var(--muted); font-size: 0.78em; line-height: 1.45; }
 
   /* Stats */
-  .stats { display: flex; gap: 60px; justify-content: center; margin-top: 30px; }
-  .stat { text-align: center; }
-  .stat b { display: block; font-size: 2.2em; color: var(--accent); font-weight: 700; line-height: 1; }
-  .stat span { color: var(--muted); font-size: 0.7em; }
+  .stats { display: flex; gap: 56px; justify-content: center; margin: 30px 0 10px; flex-wrap: wrap; }
+  .stat { text-align: center; display: flex; flex-direction: column; gap: 4px; min-width: 100px; }
+  .stat b { font-size: 2.4em; color: var(--accent); font-weight: 800; line-height: 1; font-variant-numeric: tabular-nums; }
+  .stat span { color: var(--muted); font-size: 0.72em; letter-spacing: 0.3px; }
 
   /* Tag */
   .tag {
@@ -156,6 +156,142 @@
   .layer .l-name { color: var(--accent); font-weight: 600; min-width: 130px; font-size: 0.85em; }
   .layer .l-desc { color: var(--muted); font-size: 0.78em; }
 
+  /* === Universal smooth reveal of slide content === */
+  .reveal .slides section.present > * {
+    animation: smoothIn 0.6s ease-out backwards;
+  }
+  .reveal .slides section.present > *:nth-child(1)  { animation-delay: 0.05s; }
+  .reveal .slides section.present > *:nth-child(2)  { animation-delay: 0.15s; }
+  .reveal .slides section.present > *:nth-child(3)  { animation-delay: 0.30s; }
+  .reveal .slides section.present > *:nth-child(4)  { animation-delay: 0.45s; }
+  .reveal .slides section.present > *:nth-child(5)  { animation-delay: 0.60s; }
+  .reveal .slides section.present > *:nth-child(6)  { animation-delay: 0.75s; }
+  .reveal .slides section.present > *:nth-child(7)  { animation-delay: 0.90s; }
+  .reveal .slides section.present > *:nth-child(8)  { animation-delay: 1.05s; }
+  @keyframes smoothIn {
+    from { opacity: 0; transform: translateY(14px); }
+    to   { opacity: 1; transform: none; }
+  }
+
+  /* Cascade inside .cards / .cols / .features / .layers / .pipeline / lists */
+  .reveal .slides section.present .card,
+  .reveal .slides section.present .layer,
+  .reveal .slides section.present .check-list li,
+  .reveal .slides section.present .demo-steps li,
+  .reveal .slides section.present ul > li,
+  .reveal .slides section.present table tr,
+  .reveal .slides section.present .pipeline > *,
+  .reveal .slides section.present .stat,
+  .reveal .slides section.present .elo-row {
+    animation: smoothIn 0.5s ease-out backwards;
+  }
+  .reveal .slides section.present .card:nth-child(1),
+  .reveal .slides section.present .layer:nth-child(1),
+  .reveal .slides section.present ul > li:nth-child(1),
+  .reveal .slides section.present table tr:nth-child(1),
+  .reveal .slides section.present .pipeline > *:nth-child(1),
+  .reveal .slides section.present .stat:nth-child(1)   { animation-delay: 0.30s; }
+  .reveal .slides section.present .card:nth-child(2),
+  .reveal .slides section.present .layer:nth-child(2),
+  .reveal .slides section.present ul > li:nth-child(2),
+  .reveal .slides section.present table tr:nth-child(2),
+  .reveal .slides section.present .pipeline > *:nth-child(2),
+  .reveal .slides section.present .stat:nth-child(2)   { animation-delay: 0.42s; }
+  .reveal .slides section.present .card:nth-child(3),
+  .reveal .slides section.present .layer:nth-child(3),
+  .reveal .slides section.present ul > li:nth-child(3),
+  .reveal .slides section.present table tr:nth-child(3),
+  .reveal .slides section.present .pipeline > *:nth-child(3),
+  .reveal .slides section.present .stat:nth-child(3)   { animation-delay: 0.54s; }
+  .reveal .slides section.present .card:nth-child(4),
+  .reveal .slides section.present .layer:nth-child(4),
+  .reveal .slides section.present ul > li:nth-child(4),
+  .reveal .slides section.present table tr:nth-child(4),
+  .reveal .slides section.present .pipeline > *:nth-child(4),
+  .reveal .slides section.present .stat:nth-child(4)   { animation-delay: 0.66s; }
+  .reveal .slides section.present .card:nth-child(5),
+  .reveal .slides section.present .layer:nth-child(5),
+  .reveal .slides section.present ul > li:nth-child(5),
+  .reveal .slides section.present table tr:nth-child(5),
+  .reveal .slides section.present .pipeline > *:nth-child(5),
+  .reveal .slides section.present .stat:nth-child(5)   { animation-delay: 0.78s; }
+  .reveal .slides section.present .card:nth-child(n+6),
+  .reveal .slides section.present .layer:nth-child(n+6),
+  .reveal .slides section.present ul > li:nth-child(n+6),
+  .reveal .slides section.present table tr:nth-child(n+6),
+  .reveal .slides section.present .pipeline > *:nth-child(n+6) { animation-delay: 0.90s; }
+
+  /* === ER diagram animations === */
+  .er-diagram { width: 100%; height: auto; margin-top: 8px; max-height: 70vh; }
+  .er-diagram .er-table { opacity: 0; transform-origin: center; }
+  .er-diagram .er-edges .edge {
+    stroke-dasharray: 600; stroke-dashoffset: 600;
+  }
+  /* sequential appearance */
+  .present .er-diagram .tbl-user { animation: tableIn 0.5s ease-out 0.2s forwards; }
+  .present .er-diagram .tbl-task { animation: tableIn 0.5s ease-out 0.45s forwards; }
+  .present .er-diagram .tbl-attempt { animation: tableIn 0.5s ease-out 1.1s forwards; }
+  .present .er-diagram .tbl-ach { animation: tableIn 0.5s ease-out 1.7s forwards; }
+  .present .er-diagram .tbl-ua { animation: tableIn 0.5s ease-out 2.3s forwards; }
+  .present .er-diagram .edge-1 { animation: drawEdge 0.6s ease-out 0.8s forwards; }
+  .present .er-diagram .edge-2 { animation: drawEdge 0.6s ease-out 0.95s forwards; }
+  .present .er-diagram .edge-3 { animation: drawEdge 0.6s ease-out 2.0s forwards; }
+  .present .er-diagram .edge-4 { animation: drawEdge 0.6s ease-out 2.45s forwards; }
+  @keyframes tableIn {
+    from { opacity: 0; transform: scale(0.85); }
+    to   { opacity: 1; transform: scale(1); }
+  }
+  @keyframes drawEdge {
+    to { stroke-dashoffset: 0; }
+  }
+
+  /* === ELO calculator === */
+  .elo-calc {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 10px; padding: 18px; margin-top: 14px;
+  }
+  .elo-row { display: flex; align-items: center; gap: 16px; margin: 8px 0; font-size: 0.9em; }
+  .elo-row label { min-width: 130px; color: var(--muted); font-size: 0.85em; }
+  .elo-row input[type="range"] { flex: 1; accent-color: var(--accent); }
+  .elo-row .val {
+    min-width: 60px; text-align: right; font-weight: 700; color: var(--accent);
+    font-variant-numeric: tabular-nums;
+  }
+  .elo-result {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 12px;
+    padding-top: 14px; border-top: 1px solid var(--border);
+  }
+  .elo-result .box {
+    background: var(--surface-2); border-radius: 8px; padding: 10px 14px;
+    font-size: 0.82em;
+  }
+  .elo-result .box b {
+    display: block; color: var(--accent); font-size: 1.6em; line-height: 1;
+    margin-top: 4px; font-variant-numeric: tabular-nums;
+  }
+  .elo-result .box.neg b { color: var(--bad); }
+  .elo-result .box.pos b { color: var(--good); }
+  .elo-toggle {
+    display: inline-flex; background: var(--surface-2); border-radius: 6px;
+    padding: 2px; gap: 0; margin-left: auto;
+  }
+  .elo-toggle button {
+    background: transparent; border: 0; color: var(--muted);
+    padding: 4px 12px; border-radius: 4px; cursor: pointer; font-size: 0.78em;
+  }
+  .elo-toggle button.active { background: var(--accent); color: #1a1610; font-weight: 600; }
+
+  /* === Submit flow pipeline animation === */
+  .pipeline .step { transition: transform 0.2s, border-color 0.2s, background 0.2s; }
+  .reveal .fragment.flow-step.visible {
+    background: var(--surface-2) !important;
+    border-color: var(--accent) !important;
+    transform: translateY(-2px) scale(1.03);
+  }
+
+  /* === Stats counter animation === */
+  .stat b { display: inline-block; }
+
   /* Demo steps */
   .demo-steps { counter-reset: step; padding: 0; list-style: none; }
   .demo-steps li {
@@ -179,7 +315,7 @@
 <section class="title-slide" data-background-color="#14161c">
   <div class="brand-icon"><i class="fa-solid fa-bolt"></i></div>
   <h1>ReshuLyceum</h1>
-  <p class="subtitle">Платформа подготовки к ЕГЭ по информатике<br>с адаптивной сложностью и геймификацией</p>
+  <p class="subtitle">Тренажёр для подготовки к ЕГЭ по информатике.<br>Сложность подстраивается под ученика.</p>
   <p class="meta">
     Итоговый проект · WebServer + REST API<br>
     FastAPI · SQLAlchemy · Jinja2 · SQLite
@@ -202,7 +338,7 @@
 <!-- ============ SOLUTION ============ -->
 <section>
   <h2>Решение</h2>
-  <p class="lead">Веб-платформа, которая автоматически подстраивается под уровень ученика.</p>
+  <p class="lead">Сайт, который сам подбирает задачи под уровень.</p>
   <div class="cards">
     <div class="card">
       <div class="ico"><i class="fa-solid fa-sliders"></i></div>
@@ -212,17 +348,17 @@
     <div class="card">
       <div class="ico"><i class="fa-solid fa-trophy"></i></div>
       <h4>Геймификация</h4>
-      <p>XP, уровни, серии дней подряд и 15 достижений мотивируют решать регулярно.</p>
+      <p>XP, уровни, серии дней и 15 достижений.</p>
     </div>
     <div class="card">
       <div class="ico"><i class="fa-solid fa-chart-pie"></i></div>
       <h4>Аналитика</h4>
-      <p>Статистика по темам, точность, история попыток и графики активности по дням.</p>
+      <p>Статистика по темам, точность и графики активности по дням.</p>
     </div>
     <div class="card">
       <div class="ico"><i class="fa-solid fa-ranking-star"></i></div>
       <h4>Сообщество</h4>
-      <p>Лидерборд, задача дня, рекомендации — соревновательный элемент.</p>
+      <p>Лидерборд, задача дня, рекомендации.</p>
     </div>
   </div>
   <div class="footer-note"><span>ReshuLyceum</span><span>3 / 14</span></div>
@@ -264,7 +400,7 @@
 <!-- ============ ARCHITECTURE ============ -->
 <section>
   <h2>Архитектура: слои</h2>
-  <p class="lead">Чистое разделение ответственности — каждый слой решает одну задачу.</p>
+  <p class="lead">Пять слоёв, у каждого своя роль.</p>
   <div class="layers">
     <div class="layer">
       <div class="l-name"><i class="fa-solid fa-globe"></i> web/routes</div>
@@ -293,24 +429,41 @@
 <!-- ============ ELO ============ -->
 <section>
   <h2>Алгоритм: адаптивная сложность (ELO)</h2>
-  <p class="lead">Шахматный рейтинг — но для пары «ученик / задача».</p>
-<pre><code class="language-python" data-trim>
-# app/services/rating.py
-K = 32  # коэффициент чувствительности
+  <p class="lead">То же, что в шахматах — рейтинг растёт и падает после каждой попытки. Покрутите ползунки:</p>
 
-def expected(user_r: int, task_r: int) -> float:
-    return 1 / (1 + 10 ** ((task_r - user_r) / 400))
+  <div class="elo-calc">
+    <div class="elo-row">
+      <label>Рейтинг ученика</label>
+      <input type="range" id="elo-user" min="200" max="2500" value="1200">
+      <span class="val" id="elo-user-v">1200</span>
+    </div>
+    <div class="elo-row">
+      <label>Сложность задачи</label>
+      <input type="range" id="elo-task" min="200" max="2500" value="1500">
+      <span class="val" id="elo-task-v">1500</span>
+    </div>
+    <div class="elo-row">
+      <label>Результат</label>
+      <div class="elo-toggle">
+        <button id="elo-win" class="active"><i class="fa-solid fa-check"></i> решил</button>
+        <button id="elo-lose"><i class="fa-solid fa-xmark"></i> не решил</button>
+      </div>
+    </div>
+    <div class="elo-result">
+      <div class="box">
+        <span class="muted">Ожидаемая вероятность решения</span>
+        <b id="elo-expected">15%</b>
+      </div>
+      <div class="box pos" id="elo-delta-box">
+        <span class="muted">Изменение рейтинга ученика</span>
+        <b id="elo-delta">+27</b>
+      </div>
+    </div>
+  </div>
 
-def update_ratings(user_r, task_r, won: bool):
-    e = expected(user_r, task_r)
-    delta = round(K * ((1 if won else 0) - e))
-    return user_r + delta, task_r - delta  # симметрично
-</code></pre>
-  <ul>
-    <li>Решил <b>сложную</b> задачу → +много рейтинга ученику, задача чуть «легчает»</li>
-    <li>Не решил <b>лёгкую</b> → −много рейтинга, задача чуть «тяжелеет»</li>
-    <li><b>/api/recommend</b> подбирает задачи с рейтингом, ближайшим к рейтингу ученика</li>
-  </ul>
+  <p class="muted" style="font-size:0.78em; margin-top:14px">
+    Формула: <code>E = 1 / (1 + 10^((Rtask-Ruser)/400))</code>, &Delta; = K·(результат − E), K = 32. Рейтинг задачи меняется симметрично ученику.
+  </p>
   <div class="footer-note"><span>ReshuLyceum</span><span>6 / 14</span></div>
 </section>
 
@@ -352,24 +505,91 @@ def xp_for_level(L):
 <!-- ============ DATA MODEL ============ -->
 <section>
   <h2>Модель данных</h2>
-<pre><code class="language-text" data-trim>
-User ──┬─< Attempt >──┬── Task
-       │              │
-       └─< UserAchievement >── Achievement
+  <p class="muted" style="font-size:0.78em; margin-top:-4px">5 таблиц · связи через ForeignKey · каскадное удаление</p>
 
-User:        id, email, username, hashed_password, avatar_path,
-             is_admin, xp, level, rating, current_streak,
-             longest_streak, last_solved_at, created_at
+  <svg viewBox="0 0 1180 540" class="er-diagram" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+        <path d="M 0 0 L 10 5 L 0 10 z" fill="#e8b14a"/>
+      </marker>
+    </defs>
 
-Task:        id, title, description, topic, difficulty (ELO),
-             answer (скрыт), explanation, xp_reward, created_at
+    <!-- Lines: drawn first so tables overlap them -->
+    <g stroke="#e8b14a" stroke-width="2" fill="none" class="er-edges">
+      <!-- User -> Attempt -->
+      <path d="M 240 200 L 460 200" marker-end="url(#arrow)" class="edge edge-1"/>
+      <!-- Task -> Attempt -->
+      <path d="M 940 200 L 720 200" marker-end="url(#arrow)" class="edge edge-2"/>
+      <!-- User -> UserAchievement -->
+      <path d="M 140 290 L 140 380" marker-end="url(#arrow)" class="edge edge-3"/>
+      <!-- Achievement -> UserAchievement -->
+      <path d="M 920 380 L 360 410" marker-end="url(#arrow)" class="edge edge-4"/>
+    </g>
 
-Attempt:     id, user_id, task_id, submitted_answer, is_correct,
-             xp_gained, rating_delta, created_at
+    <!-- USER -->
+    <g class="er-table tbl-user">
+      <rect x="40" y="80" width="200" height="210" rx="10" fill="#1c1f27" stroke="#363b47"/>
+      <rect x="40" y="80" width="200" height="32" rx="10" fill="#242832"/>
+      <text x="56" y="101" fill="#e8b14a" font-size="14" font-weight="700">User</text>
+      <text x="56" y="130" fill="#8c92a3" font-size="11">id, email, username</text>
+      <text x="56" y="148" fill="#8c92a3" font-size="11">hashed_password</text>
+      <text x="56" y="166" fill="#8c92a3" font-size="11">avatar_path, is_admin</text>
+      <text x="56" y="190" fill="#e6e7eb" font-size="11" font-weight="600">xp, level, rating</text>
+      <text x="56" y="208" fill="#e6e7eb" font-size="11" font-weight="600">current_streak</text>
+      <text x="56" y="226" fill="#e6e7eb" font-size="11" font-weight="600">longest_streak</text>
+      <text x="56" y="244" fill="#8c92a3" font-size="11">last_solved_at</text>
+      <text x="56" y="262" fill="#8c92a3" font-size="11">created_at</text>
+    </g>
 
-Achievement: id, code, title, description, icon
-</code></pre>
-  <p class="muted" style="font-size:0.78em">5 таблиц · все связи через ForeignKey · каскадное удаление</p>
+    <!-- ATTEMPT (centre) -->
+    <g class="er-table tbl-attempt">
+      <rect x="460" y="100" width="260" height="180" rx="10" fill="#1c1f27" stroke="#363b47"/>
+      <rect x="460" y="100" width="260" height="32" rx="10" fill="#242832"/>
+      <text x="476" y="121" fill="#e8b14a" font-size="14" font-weight="700">Attempt</text>
+      <text x="476" y="150" fill="#5fb37a" font-size="11" font-weight="600">FK user_id → User</text>
+      <text x="476" y="168" fill="#5fb37a" font-size="11" font-weight="600">FK task_id → Task</text>
+      <text x="476" y="192" fill="#8c92a3" font-size="11">submitted_answer</text>
+      <text x="476" y="210" fill="#8c92a3" font-size="11">is_correct</text>
+      <text x="476" y="228" fill="#8c92a3" font-size="11">xp_gained, rating_delta</text>
+      <text x="476" y="252" fill="#8c92a3" font-size="11">created_at</text>
+    </g>
+
+    <!-- TASK -->
+    <g class="er-table tbl-task">
+      <rect x="940" y="80" width="200" height="230" rx="10" fill="#1c1f27" stroke="#363b47"/>
+      <rect x="940" y="80" width="200" height="32" rx="10" fill="#242832"/>
+      <text x="956" y="101" fill="#e8b14a" font-size="14" font-weight="700">Task</text>
+      <text x="956" y="130" fill="#8c92a3" font-size="11">id, title, description</text>
+      <text x="956" y="148" fill="#8c92a3" font-size="11">topic</text>
+      <text x="956" y="172" fill="#e6e7eb" font-size="11" font-weight="600">difficulty (ELO)</text>
+      <text x="956" y="190" fill="#e6e7eb" font-size="11" font-weight="600">xp_reward</text>
+      <text x="956" y="214" fill="#d56b6b" font-size="11">answer (скрыт)</text>
+      <text x="956" y="232" fill="#8c92a3" font-size="11">explanation</text>
+      <text x="956" y="256" fill="#8c92a3" font-size="11">created_at</text>
+    </g>
+
+    <!-- USER_ACHIEVEMENT (junction) -->
+    <g class="er-table tbl-ua">
+      <rect x="40" y="380" width="320" height="120" rx="10" fill="#1c1f27" stroke="#363b47"/>
+      <rect x="40" y="380" width="320" height="32" rx="10" fill="#242832"/>
+      <text x="56" y="401" fill="#e8b14a" font-size="14" font-weight="700">UserAchievement</text>
+      <text x="56" y="432" fill="#5fb37a" font-size="11" font-weight="600">FK user_id, FK achievement_id</text>
+      <text x="56" y="452" fill="#8c92a3" font-size="11">unlocked_at</text>
+      <text x="56" y="476" fill="#8c92a3" font-size="10" font-style="italic">— связь достижений с пользователями (many≡many)</text>
+    </g>
+
+    <!-- ACHIEVEMENT -->
+    <g class="er-table tbl-ach">
+      <rect x="920" y="360" width="220" height="140" rx="10" fill="#1c1f27" stroke="#363b47"/>
+      <rect x="920" y="360" width="220" height="32" rx="10" fill="#242832"/>
+      <text x="936" y="381" fill="#e8b14a" font-size="14" font-weight="700">Achievement</text>
+      <text x="936" y="410" fill="#8c92a3" font-size="11">id, code</text>
+      <text x="936" y="428" fill="#8c92a3" font-size="11">title, description</text>
+      <text x="936" y="446" fill="#8c92a3" font-size="11">icon</text>
+      <text x="936" y="472" fill="#8c92a3" font-size="10" font-style="italic">15 записей (сидрится автоматически)</text>
+    </g>
+  </svg>
+
   <div class="footer-note"><span>ReshuLyceum</span><span>8 / 14</span></div>
 </section>
 
@@ -397,6 +617,7 @@ Achievement: id, code, title, description, icon
 <!-- ============ SUBMIT FLOW ============ -->
 <section>
   <h2>Сценарий: сдача ответа</h2>
+  <p class="lead">Один POST-запрос запускает цепочку из пяти операций.</p>
   <div class="pipeline">
     <div class="step"><b>POST</b>/api/attempts</div>
     <span class="arrow">→</span>
@@ -410,8 +631,6 @@ Achievement: id, code, title, description, icon
     <span class="arrow">→</span>
     <div class="step"><b>JSON</b>результат + toast</div>
   </div>
-  <p class="muted" style="font-size:0.8em">Один POST-запрос — пять последовательных бизнес-операций в транзакции.</p>
-
   <h3>Проверка ответа — допускаются:</h3>
   <ul style="font-size:0.85em">
     <li>Регистр и лишние пробелы (<code>"  Yes "</code> = <code>"yes"</code>)</li>
@@ -476,12 +695,12 @@ Achievement: id, code, title, description, icon
 <!-- ============ NUMBERS / FUTURE ============ -->
 <section>
   <h2>Итого и развитие</h2>
-  <div class="stats">
-    <div class="stat"><b>33</b><span>демо-задач</span></div>
-    <div class="stat"><b>9</b><span>тем</span></div>
-    <div class="stat"><b>15</b><span>достижений</span></div>
-    <div class="stat"><b>16</b><span>тестов</span></div>
-    <div class="stat"><b>20+</b><span>эндпоинтов</span></div>
+  <div class="stats" data-stats>
+    <div class="stat"><b data-count="33">0</b><span>демо-задач</span></div>
+    <div class="stat"><b data-count="9">0</b><span>тем</span></div>
+    <div class="stat"><b data-count="15">0</b><span>достижений</span></div>
+    <div class="stat"><b data-count="16">0</b><span>тестов</span></div>
+    <div class="stat"><b data-count="20" data-suffix="+">0</b><span>эндпоинтов</span></div>
   </div>
 
   <h3 style="margin-top:30px">Куда развивать</h3>
@@ -499,7 +718,7 @@ Achievement: id, code, title, description, icon
     <div class="card">
       <div class="ico"><i class="fa-solid fa-comments"></i></div>
       <h4>Комментарии и подсказки</h4>
-      <p>Обсуждение решений, пошаговые подсказки за XP.</p>
+      <p>Обсуждение решений и подсказки за XP.</p>
     </div>
   </div>
   <div class="footer-note"><span>ReshuLyceum</span><span>14 / 14</span></div>
@@ -526,9 +745,14 @@ Achievement: id, code, title, description, icon
     hash: true,
     slideNumber: false,
     transition: 'slide',
-    transitionSpeed: 'fast',
+    transitionSpeed: 'default',
+    backgroundTransition: 'fade',
     controls: true,
     progress: true,
+    history: true,
+    keyboard: true,
+    overview: true,
+    touch: true,
     plugins: [ RevealHighlight ],
     width: 1280,
     height: 800,
@@ -537,6 +761,59 @@ Achievement: id, code, title, description, icon
     minScale: 0.4,
     maxScale: 1.2,
   });
+
+  // ====== ELO calculator ======
+  function updateELO() {
+    const u = +document.getElementById('elo-user').value;
+    const t = +document.getElementById('elo-task').value;
+    const won = document.getElementById('elo-win').classList.contains('active');
+    const E = 1 / (1 + Math.pow(10, (t - u) / 400));
+    const delta = Math.round(32 * ((won ? 1 : 0) - E));
+    document.getElementById('elo-user-v').textContent = u;
+    document.getElementById('elo-task-v').textContent = t;
+    document.getElementById('elo-expected').textContent = Math.round(E * 100) + '%';
+    const box = document.getElementById('elo-delta-box');
+    document.getElementById('elo-delta').textContent = (delta > 0 ? '+' : '') + delta;
+    box.classList.toggle('pos', delta >= 0);
+    box.classList.toggle('neg', delta < 0);
+  }
+  document.querySelectorAll('#elo-user, #elo-task').forEach(el => el.addEventListener('input', updateELO));
+  document.getElementById('elo-win').addEventListener('click', () => {
+    document.getElementById('elo-win').classList.add('active');
+    document.getElementById('elo-lose').classList.remove('active');
+    updateELO();
+  });
+  document.getElementById('elo-lose').addEventListener('click', () => {
+    document.getElementById('elo-lose').classList.add('active');
+    document.getElementById('elo-win').classList.remove('active');
+    updateELO();
+  });
+  updateELO();
+
+  // ====== Animated counters for stats slide ======
+  function animateCounter(el) {
+    const target = +el.dataset.count;
+    const suffix = el.dataset.suffix || '';
+    const duration = 900;
+    const start = performance.now();
+    function tick(now) {
+      const p = Math.min(1, (now - start) / duration);
+      const eased = 1 - Math.pow(1 - p, 3);
+      el.textContent = Math.round(target * eased) + (p === 1 ? suffix : '');
+      if (p < 1) requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+  }
+  Reveal.on('slidechanged', e => {
+    const stats = e.currentSlide.querySelector('[data-stats]');
+    if (stats) stats.querySelectorAll('[data-count]').forEach(animateCounter);
+  });
+  // run once on initial load if first slide has stats
+  setTimeout(() => {
+    const cur = document.querySelector('.present');
+    const stats = cur && cur.querySelector('[data-stats]');
+    if (stats) stats.querySelectorAll('[data-count]').forEach(animateCounter);
+  }, 100);
 </script>
 </body>
 </html>
